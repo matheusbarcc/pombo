@@ -24,10 +24,19 @@ public class PruuService {
         return pruuRepository.findAll();
     }
 
+    public Pruu findById(UUID id) {
+        return pruuRepository.findById(id).orElse(null);
+    }
+
+    //public Set<Pruu> fetchByUserId(UUID userId) {
+      //  return pruuRepository.findByUserId(userId);
+    //}
+
     public Pruu create(Pruu pruu) {
         return pruuRepository.save(pruu);
     }
 
+    // throw exception caso o usuario ja tenha dado like? ou como é um set nao precisa ja que o usuario nao vai se repetir?
     public void like(UUID userId, UUID pruuId) {
         Pruu pruu = pruuRepository.findById(pruuId).orElse(null);
         Set<User> likes = pruu.getLikes();

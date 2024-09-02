@@ -22,14 +22,15 @@ public class Pruu {
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "user_fk")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @NotBlank
     @Max(value = 300, message = "O texto deve ter no máximo 300 caracteres.")
     private String content;
 
-    @OneToMany(mappedBy = "pruu")
+    @ManyToMany
+    @JoinTable(name = "pruu_like", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "pruu_id"))
     private Set<User> likes;
 
     @CreationTimestamp

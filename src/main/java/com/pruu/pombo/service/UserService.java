@@ -13,15 +13,15 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    private User findById(UUID id) {
+    public User findById(UUID id) {
         return userRepository.findById(id).orElse(null);
     }
 
-    private User create(User user) {
+    public User create(User user) {
         return userRepository.save(user);
     }
 
-    private User update(User user) {
+    public User update(User user) {
         return userRepository.save(user);
     }
 }
