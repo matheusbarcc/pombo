@@ -3,7 +3,9 @@ package com.pruu.pombo.model.entity;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
@@ -12,7 +14,6 @@ import java.time.LocalDate;
 import java.util.Set;
 
 @Entity
-@Table
 @Data
 public class Pruu {
 
@@ -26,7 +27,7 @@ public class Pruu {
     private User user;
 
     @NotBlank
-    @Max(value = 300, message = "O texto deve ter no máximo 300 caracteres.")
+    @Size(max = 300, message = "O texto deve ter no máximo 300 caracteres.")
     private String content;
 
     @ManyToMany
