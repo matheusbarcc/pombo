@@ -2,6 +2,7 @@ package com.pruu.pombo.controller;
 
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.entity.Pruu;
+import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.service.PruuService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,5 +26,10 @@ public class PruuController {
     @GetMapping
     public List<Pruu> findAll() {
         return pruuService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Pruu> findById(@PathVariable String id) {
+        return ResponseEntity.ok(pruuService.findById(id));
     }
 }
