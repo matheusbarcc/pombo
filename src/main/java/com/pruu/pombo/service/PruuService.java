@@ -1,5 +1,6 @@
 package com.pruu.pombo.service;
 
+import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.entity.Pruu;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.PruuRepository;
@@ -25,24 +26,33 @@ public class PruuService {
     }
 
     public Pruu findById(UUID id) {
-        return pruuRepository.findById(id).orElse(null);
+        return pruuRepository.findById(id.toString()).orElse(null);
     }
 
     //public Set<Pruu> fetchByUserId(UUID userId) {
       //  return pruuRepository.findByUserId(userId);
     //}
 
-    public Pruu create(Pruu pruu) {
+    public Pruu create(Pruu pruu) throws PomboException {
+        verifyIfUserExists(pruu);
+
         return pruuRepository.save(pruu);
     }
 
-    // throw exception caso o usuario ja tenha dado like? ou como é um set nao precisa ja que o usuario nao vai se repetir?
     public void like(UUID userId, UUID pruuId) {
-        Pruu pruu = pruuRepository.findById(pruuId).orElse(null);
+        Pruu pruu = pruuRepository.findById(pruuId.toString()).orElse(null);
         Set<User> likes = pruu.getLikes();
-        User user = userRepository.findById(userId).orElse(null);
+        User user = userRepository.findById(userId.toString()).orElse(null);
         likes.add(user);
         pruu.setLikes(likes);
         pruuRepository.save(pruu);
+    }
+
+    public void verifyIfUserExists(Pruu pruu) throws PomboException {
+        User user = userRepository.findById(pruu.getUser().getId()).orElse(null);
+
+        if(user == null) {
+            throw new PomboException("Usuário não existente.");
+        }
     }
 }

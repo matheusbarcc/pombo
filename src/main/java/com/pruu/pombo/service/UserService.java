@@ -14,7 +14,7 @@ public class UserService {
     private UserRepository userRepository;
 
     public User findById(UUID id) {
-        return userRepository.findById(id).orElse(null);
+        return userRepository.findById(id.toString()).orElse(null);
     }
 
     public User create(User user) {

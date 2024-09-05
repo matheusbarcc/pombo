@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Repository
-public interface PruuRepository extends JpaRepository<Pruu, UUID> {
+public interface PruuRepository extends JpaRepository<Pruu, String> {
 
     // Set<Pruu> findByUserId(UUID userId);
 }

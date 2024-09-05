@@ -31,17 +31,19 @@ public class User {
 
     @NotBlank
     @Email(message = "O email deve ser válido.")
+    @Column(unique = true)
     private String email;
 
     @NotBlank
     @CPF
+    @Column(unique = true)
     private String cpf;
 
     @OneToMany(mappedBy = "user")
     private Set<Pruu> pruus;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role = Role.USER; // Seta o valor default de role como USER quando nao é informado explicitamente
 
     @CreationTimestamp
     private LocalDate createdAt;
