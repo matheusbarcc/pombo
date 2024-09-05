@@ -5,6 +5,7 @@ import com.pruu.pombo.model.entity.Pruu;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.PruuRepository;
 import com.pruu.pombo.model.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,10 +40,11 @@ public class PruuService {
         return pruuRepository.save(pruu);
     }
 
-    public void like(UUID userId, UUID pruuId) {
-        Pruu pruu = pruuRepository.findById(pruuId.toString()).orElse(null);
+    public void like(String userId, String pruuId) {
+        Pruu pruu = pruuRepository.findById(pruuId).orElse(null);
         Set<User> likes = pruu.getLikes();
-        User user = userRepository.findById(userId.toString()).orElse(null);
+
+        User user = userRepository.findById(userId).orElse(null);
 
         if(likes.contains(user)) {
             likes.remove(user);

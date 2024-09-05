@@ -1,5 +1,6 @@
 package com.pruu.pombo.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
@@ -24,6 +25,7 @@ public class User {
     private String id;
 
     @ManyToMany(mappedBy = "likes")
+    @JsonManagedReference
     Set<Pruu> likedPruus;
 
     @NotBlank

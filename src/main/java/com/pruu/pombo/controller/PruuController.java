@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping(path = "/pruu")
@@ -32,4 +33,11 @@ public class PruuController {
     public ResponseEntity<Pruu> findById(@PathVariable String id) {
         return ResponseEntity.ok(pruuService.findById(id));
     }
+
+    @PatchMapping("/like")
+    public ResponseEntity<Void> like(@RequestParam String userId, @RequestParam String pruuId) {
+        pruuService.like(userId, pruuId);
+        return ResponseEntity.ok().build();
+    }
+
 }
