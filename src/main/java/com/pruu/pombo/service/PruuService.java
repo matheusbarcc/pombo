@@ -25,8 +25,8 @@ public class PruuService {
         return pruuRepository.findAll();
     }
 
-    public Pruu findById(UUID id) {
-        return pruuRepository.findById(id.toString()).orElse(null);
+    public Pruu findById(String id) {
+        return pruuRepository.findById(id).orElse(null);
     }
 
     //public Set<Pruu> fetchByUserId(UUID userId) {

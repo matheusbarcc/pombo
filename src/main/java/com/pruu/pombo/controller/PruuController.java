@@ -6,10 +6,9 @@ import com.pruu.pombo.service.PruuService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/pruu")
@@ -21,5 +20,10 @@ public class PruuController {
     @PostMapping
     public Pruu create(@Valid @RequestBody Pruu pruu) throws PomboException {
         return ResponseEntity.ok(pruuService.create(pruu)).getBody();
+    }
+
+    @GetMapping
+    public List<Pruu> findAll() {
+        return pruuService.findAll();
     }
 }
