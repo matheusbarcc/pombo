@@ -43,7 +43,13 @@ public class PruuService {
         Pruu pruu = pruuRepository.findById(pruuId.toString()).orElse(null);
         Set<User> likes = pruu.getLikes();
         User user = userRepository.findById(userId.toString()).orElse(null);
-        likes.add(user);
+
+        if(likes.contains(user)) {
+            likes.remove(user);
+        } else {
+            likes.add(user);
+        }
+
         pruu.setLikes(likes);
         pruuRepository.save(pruu);
     }
