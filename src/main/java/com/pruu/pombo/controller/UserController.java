@@ -20,6 +20,11 @@ public class UserController {
         return ResponseEntity.ok(userService.create(user)).getBody();
     }
 
+    @PutMapping
+    public User update(@Valid @RequestBody User user) throws PomboException {
+        return userService.update(user);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<User> findById(@PathVariable String id) {
         return ResponseEntity.ok(userService.findById(id));
