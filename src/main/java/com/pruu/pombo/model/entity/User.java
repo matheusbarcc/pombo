@@ -1,12 +1,8 @@
 package com.pruu.pombo.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,7 +11,6 @@ import org.hibernate.validator.constraints.br.CPF;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table
@@ -28,12 +23,8 @@ public class User {
     private String id;
 
     @OneToMany(mappedBy = "user")
-    @JsonManagedReference
+    @JsonBackReference
     private List<Pruu> pruus;
-
-    @ManyToMany(mappedBy = "likes")
-    @JsonManagedReference
-    List<Pruu> likedPruus;
 
     @NotBlank
     private String name;
