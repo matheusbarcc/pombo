@@ -5,12 +5,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDate;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table
@@ -24,6 +23,7 @@ public class Pruu {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user;
 
     @NotBlank
@@ -31,10 +31,9 @@ public class Pruu {
     private String content;
 
     @ManyToMany
-    @JsonBackReference
     @JoinTable(name = "pruu_like", joinColumns = @JoinColumn(name = "pruu_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    @EqualsAndHashCode.Exclude
-    private Set<User> likes;
+    @JsonBackReference
+    private List<User> likes;
 
     @CreationTimestamp
     private LocalDate createdAt;

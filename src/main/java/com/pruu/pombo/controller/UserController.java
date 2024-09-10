@@ -17,7 +17,7 @@ public class UserController {
 
     @PostMapping
     public User create(@Valid @RequestBody User user) throws PomboException {
-        return ResponseEntity.ok(userService.create(user)).getBody();
+        return userService.create(user);
     }
 
     @PutMapping

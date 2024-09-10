@@ -1,5 +1,7 @@
 package com.pruu.pombo.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -12,6 +14,7 @@ import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.validator.constraints.br.CPF;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -24,9 +27,13 @@ public class User {
     @UuidGenerator
     private String id;
 
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
+    private List<Pruu> pruus;
+
     @ManyToMany(mappedBy = "likes")
     @JsonManagedReference
-    Set<Pruu> likedPruus;
+    List<Pruu> likedPruus;
 
     @NotBlank
     private String name;
@@ -41,8 +48,6 @@ public class User {
     @Column(unique = true)
     private String cpf;
 
-    @OneToMany(mappedBy = "user")
-    private Set<Pruu> pruus;
 
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER; // Seta o valor default de role como USER quando nao é informado explicitamente

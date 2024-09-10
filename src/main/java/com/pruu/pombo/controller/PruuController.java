@@ -24,20 +24,25 @@ public class PruuController {
         return ResponseEntity.ok(pruuService.create(pruu)).getBody();
     }
 
+    @PatchMapping("/like")
+    public ResponseEntity<Void> like(@RequestParam String userId, @RequestParam String pruuId) {
+        pruuService.like(userId, pruuId);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping
     public List<Pruu> findAll() {
         return pruuService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Pruu> findById(@PathVariable String id) {
+    public ResponseEntity<Pruu> findById(@PathVariable String id) throws PomboException {
         return ResponseEntity.ok(pruuService.findById(id));
     }
 
-    @PatchMapping("/like")
-    public ResponseEntity<Void> like(@RequestParam String userId, @RequestParam String pruuId) {
-        pruuService.like(userId, pruuId);
-        return ResponseEntity.ok().build();
+    @GetMapping("/user/{id}")
+    public List<Pruu> fetchByUserId(@PathVariable String id) {
+        return pruuService.fetchByUserId(id);
     }
 
 }

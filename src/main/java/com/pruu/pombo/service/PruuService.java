@@ -5,7 +5,6 @@ import com.pruu.pombo.model.entity.Pruu;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.PruuRepository;
 import com.pruu.pombo.model.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,13 +25,13 @@ public class PruuService {
         return pruuRepository.findAll();
     }
 
-    public Pruu findById(String id) {
-        return pruuRepository.findById(id).orElse(null);
+    public Pruu findById(String id) throws PomboException {
+        return pruuRepository.findById(id).orElseThrow(() -> new PomboException("Pruu nao encontrado."));
     }
 
-    //public Set<Pruu> fetchByUserId(UUID userId) {
-      //  return pruuRepository.findByUserId(userId);
-    //}
+    public List<Pruu> fetchByUserId(String userId) {
+        return pruuRepository.findByUserId(userId);
+    }
 
     public Pruu create(Pruu pruu) throws PomboException {
         verifyIfUserExists(pruu);
@@ -42,7 +41,7 @@ public class PruuService {
 
     public void like(String userId, String pruuId) {
         Pruu pruu = pruuRepository.findById(pruuId).orElse(null);
-        Set<User> likes = pruu.getLikes();
+        List<User> likes = pruu.getLikes();
 
         User user = userRepository.findById(userId).orElse(null);
 

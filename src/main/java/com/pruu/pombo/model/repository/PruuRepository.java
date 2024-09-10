@@ -11,5 +11,5 @@ import java.util.UUID;
 @Repository
 public interface PruuRepository extends JpaRepository<Pruu, String> {
 
-    // Set<Pruu> findByUserId(UUID userId);
+     List<Pruu> findByUserId(String userId);
 }
