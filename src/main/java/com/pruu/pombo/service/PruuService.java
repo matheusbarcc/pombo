@@ -3,17 +3,17 @@ package com.pruu.pombo.service;
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.entity.Complaint;
 import com.pruu.pombo.model.entity.Pruu;
-import com.pruu.pombo.model.entity.Role;
+import com.pruu.pombo.model.enums.Role;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.ComplaintRepository;
 import com.pruu.pombo.model.repository.PruuRepository;
 import com.pruu.pombo.model.repository.UserRepository;
+import com.pruu.pombo.model.selector.PruuSelector;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 @Service
 public class PruuService {
@@ -81,6 +81,18 @@ public class PruuService {
 
         pruu.setBlocked(true);
         pruuRepository.save(pruu);
+    }
+
+    public List<Pruu> fetchWithFilter(PruuSelector selector) {
+        if(selector.hasPagination()) {
+            int pageNumber = selector.getPage();
+            int pageSize = selector.getLimit();
+
+            PageRequest page = PageRequest.of(pageNumber - 1, pageSize);
+            return pruuRepository.findAll(selector, page).toList();
+        }
+
+        return pruuRepository.findAll(selector);
     }
 
     public void verifyIfUserExists(Pruu pruu) throws PomboException {

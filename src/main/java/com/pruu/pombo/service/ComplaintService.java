@@ -2,7 +2,7 @@ package com.pruu.pombo.service;
 
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.entity.Complaint;
-import com.pruu.pombo.model.entity.Role;
+import com.pruu.pombo.model.enums.Role;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.ComplaintRepository;
 import com.pruu.pombo.model.repository.UserRepository;

@@ -2,6 +2,7 @@ package com.pruu.pombo.controller;
 
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.entity.Pruu;
+import com.pruu.pombo.model.selector.PruuSelector;
 import com.pruu.pombo.service.PruuService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,11 @@ public class PruuController {
     @PostMapping
     public Pruu create(@Valid @RequestBody Pruu pruu) throws PomboException {
         return ResponseEntity.ok(pruuService.create(pruu)).getBody();
+    }
+
+    @PostMapping("/filter")
+    public List<Pruu> fetchWithFilter(@RequestBody PruuSelector selector) {
+        return pruuService.fetchWithFilter(selector);
     }
 
     @PostMapping("/like")

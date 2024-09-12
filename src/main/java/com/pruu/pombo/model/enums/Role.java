@@ -1,4 +1,4 @@
-package com.pruu.pombo.model.entity;
+package com.pruu.pombo.model.enums;
 
 public enum Role {
     ADMIN,

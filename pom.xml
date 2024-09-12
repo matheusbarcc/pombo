@@ -11,7 +11,7 @@
     <groupId>com.pruu</groupId>
     <artifactId>pombo</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+<!--    <packaging>war</packaging>-->
     <name>pombo</name>
     <description>pombo</description>
     <url/>
