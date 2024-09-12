@@ -7,12 +7,10 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table
 @Data
 public class Pruu {
 
@@ -26,12 +24,14 @@ public class Pruu {
     private User user;
 
     @NotBlank
-    @Size(max = 300, message = "O conteúdo do Pruu deve conter no máximo 300 caracteres.")
+    @Size(min = 1, max = 300, message = "O conteúdo do Pruu deve conter no máximo 300 caracteres.")
     private String content;
 
     @ManyToMany
     @JoinTable(name = "pruu_like", joinColumns = @JoinColumn(name = "pruu_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> likes;
+
+    private boolean blocked;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

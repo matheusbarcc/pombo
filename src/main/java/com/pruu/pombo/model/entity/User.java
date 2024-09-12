@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table
 @Data
 public class User {
 
@@ -38,7 +37,6 @@ public class User {
     @CPF
     @Column(unique = true)
     private String cpf;
-
 
     @Enumerated(EnumType.STRING)
     private Role role = Role.USER; // Seta o valor default de role como USER quando nao é informado explicitamente

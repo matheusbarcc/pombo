@@ -2,7 +2,6 @@ package com.pruu.pombo.controller;
 
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.entity.Pruu;
-import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.service.PruuService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequestMapping(path = "/pruu")
@@ -24,9 +22,15 @@ public class PruuController {
         return ResponseEntity.ok(pruuService.create(pruu)).getBody();
     }
 
-    @PatchMapping("/like")
+    @PostMapping("/like")
     public ResponseEntity<Void> like(@RequestParam String userId, @RequestParam String pruuId) {
         pruuService.like(userId, pruuId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/block")
+    public ResponseEntity<Void> block(@RequestParam String userId, @RequestParam String pruuId) throws PomboException {
+        pruuService.block(userId, pruuId);
         return ResponseEntity.ok().build();
     }
 
