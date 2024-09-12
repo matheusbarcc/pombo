@@ -37,4 +37,10 @@ public class UserController {
     public ResponseEntity<User> findById(@PathVariable String id) {
         return ResponseEntity.ok(userService.findById(id));
     }
+
+//    @DeleteMapping("/{id}")
+//    public boolean deleteById(@PathVariable String id) {
+//        // TODO validate permission
+//        return userService.delete(id);
+//    }
 }

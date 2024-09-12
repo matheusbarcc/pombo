@@ -43,7 +43,10 @@ public class UserService {
         return userRepository.findAll(selector);
     }
 
-
+    public boolean delete(String id) {
+        userRepository.deleteById(id);
+        return true;
+    }
 
     public void standardizeCpf(User user) {
         user.setCpf(user.getCpf().replaceAll("[.]", ""));

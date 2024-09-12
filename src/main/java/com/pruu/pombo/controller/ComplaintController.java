@@ -2,6 +2,7 @@ package com.pruu.pombo.controller;
 
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.entity.Complaint;
+import com.pruu.pombo.model.selector.ComplaintSelector;
 import com.pruu.pombo.service.ComplaintService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,11 @@ public class ComplaintController {
         return complaintService.create(complaint);
     }
 
+    @PostMapping("/filter")
+    public List<Complaint> fetchWithFilter(@RequestBody ComplaintSelector selector) {
+        return complaintService.fetchWithFilter(selector);
+    }
+
     @GetMapping
     public List<Complaint> findAll(@RequestParam String userId) throws PomboException {
         return complaintService.findAll(userId);
@@ -31,5 +37,10 @@ public class ComplaintController {
         return complaintService.findById(id, userId);
     }
 
+    @DeleteMapping("/{id}")
+    public boolean deleteById(@PathVariable String id) {
+        // TODO validate permission
+        return complaintService.delete(id);
+    }
 
 }

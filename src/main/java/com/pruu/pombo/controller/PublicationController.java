@@ -55,4 +55,10 @@ public class PublicationController {
     public ResponseEntity<Publication> findById(@PathVariable String id) throws PomboException {
         return ResponseEntity.ok(publicationService.findById(id));
     }
+
+//    @DeleteMapping("/{id}")
+//    public boolean delete(@PathVariable String id){
+//        // TODO validate permission
+//        return publicationService.delete(id);
+//    }
 }

@@ -88,6 +88,11 @@ public class PublicationService {
         return publication.getLikes();
     }
 
+    public boolean delete(String id){
+        publicationRepository.deleteById(id);
+        return true;
+    }
+
     public void verifyAdmin(String userId) throws PomboException{
         User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuário não encontrado."));
 
