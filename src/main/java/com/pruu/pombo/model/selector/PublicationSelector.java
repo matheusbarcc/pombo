@@ -1,6 +1,6 @@
 package com.pruu.pombo.model.selector;
 
-import com.pruu.pombo.model.entity.Pruu;
+import com.pruu.pombo.model.entity.Publication;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -13,25 +13,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class PruuSelector extends BaseSelector implements Specification<Pruu> {
+public class PublicationSelector extends BaseSelector implements Specification<Publication> {
 
     private String userId;
     private String content;
     private LocalDateTime createdAtStart;
     private LocalDateTime createdAtEnd;
 
-    public boolean hasFilter() {
-        return (this.isValidString(content))
-                || (this.userId != null)
-                || (this.createdAtStart != null)
-                || (this.createdAtEnd != null);
-    }
-
     @Override
-    public Predicate toPredicate(Root<Pruu> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
+    public Predicate toPredicate(Root<Publication> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
         List<Predicate> predicates = new ArrayList<>();
 
-        if(this.getContent() != null && this.getContent().trim().length() > 0) {
+        if(this.getContent() != null && !this.getContent().trim().isEmpty()) {
             // WHERE/AND  COLUMN  OPERATOR         VALUE
             //   where    content   like  '%substring do content%'
             predicates.add(cb.like(root.get("content"), "%" + this.getContent() + "%"));
@@ -43,6 +36,6 @@ public class PruuSelector extends BaseSelector implements Specification<Pruu> {
 
         applyDateRangeFilter(root, cb, predicates, this.getCreatedAtStart(), this.getCreatedAtEnd(), "createdAt");
 
-        return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+        return cb.and(predicates.toArray(new Predicate[0]));
     }
 }

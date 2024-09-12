@@ -35,14 +35,10 @@ public class ComplaintService {
     }
 
     public void verifyAdmin(String userId) throws PomboException{
-        User user = userRepository.findById(userId).orElse(null);
-
-        if(user == null) {
-            throw new PomboException("Usuário não existe.");
-        }
+        User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuario nao encontrado."));
 
         if(user.getRole() == Role.USER) {
-            throw new PomboException("Usuário sem acesso.");
+            throw new PomboException("Usuário não autorizado.");
         }
     }
 }

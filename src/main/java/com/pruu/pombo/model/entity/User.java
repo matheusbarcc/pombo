@@ -10,7 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.validator.constraints.br.CPF;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -24,7 +24,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonBackReference
-    private List<Pruu> pruus;
+    private List<Publication> publications;
 
     @NotBlank
     private String name;
@@ -40,8 +40,8 @@ public class User {
     private String cpf;
 
     @Enumerated(EnumType.STRING)
-    private Role role = Role.USER; // Seta o valor default de role como USER quando nao é informado explicitamente
+    private Role role = Role.USER; // If the value is not informed, its default is USER
 
     @CreationTimestamp
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 }

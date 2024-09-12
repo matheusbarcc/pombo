@@ -32,13 +32,10 @@ public abstract class BaseSelector {
                                             CriteriaBuilder cb, List<Predicate> predicates,
                                             LocalDateTime startDate, LocalDateTime endDate, String attributeName) {
         if (startDate != null && endDate != null) {
-            // WHERE attribute BETWEEN min AND max
             predicates.add(cb.between(root.get(attributeName), startDate, endDate));
         } else if (startDate != null) {
-            // WHERE attribute >= min
             predicates.add(cb.greaterThanOrEqualTo(root.get(attributeName), startDate));
         } else if (endDate != null) {
-            // WHERE attribute <= max
             predicates.add(cb.lessThanOrEqualTo(root.get(attributeName), endDate));
         }
     }

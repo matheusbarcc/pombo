@@ -12,7 +12,7 @@ import java.util.List;
 
 @Entity
 @Data
-public class Pruu {
+public class Publication {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -24,14 +24,14 @@ public class Pruu {
     private User user;
 
     @NotBlank
-    @Size(min = 1, max = 300, message = "O conteúdo do Pruu deve conter no máximo 300 caracteres.")
+    @Size(max = 300, message = "O conteúdo do Pruu deve conter no máximo 300 caracteres.")
     private String content;
 
     @ManyToMany
-    @JoinTable(name = "pruu_like", joinColumns = @JoinColumn(name = "pruu_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JoinTable(name = "publication_like", joinColumns = @JoinColumn(name = "publication_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> likes;
 
-    private boolean blocked;
+    private boolean blocked = false;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
