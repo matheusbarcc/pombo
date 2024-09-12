@@ -1,7 +1,9 @@
 package com.pruu.pombo.model.entity;
 
+import com.pruu.pombo.model.enums.Reason;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.annotations.UuidGenerator;
@@ -23,7 +25,6 @@ public class Complaint {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Size(max = 300, message = "A denuncia deve conter no máximo 300 caracteres.")
-    @NotBlank
-    private String reason;
+    @NotNull
+    private Reason reason;
 }

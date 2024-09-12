@@ -2,6 +2,7 @@ package com.pruu.pombo.controller;
 
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.entity.Publication;
+import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.selector.PublicationSelector;
 import com.pruu.pombo.service.PublicationService;
 import jakarta.validation.Valid;
@@ -43,6 +44,11 @@ public class PublicationController {
     @GetMapping
     public List<Publication> findAll() {
         return publicationService.findAll();
+    }
+
+    @GetMapping("/likes")
+    public List<User> fetchPublicationLikes(@RequestParam String publicationId) throws PomboException {
+        return publicationService.fetchPublicationLikes(publicationId);
     }
 
     @GetMapping("/{id}")

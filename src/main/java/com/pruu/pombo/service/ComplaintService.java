@@ -31,11 +31,11 @@ public class ComplaintService {
 
     public Complaint findById(String complaintId, String userId) throws PomboException {
         verifyAdmin(userId);
-        return complaintRepository.findById(complaintId).orElseThrow(() -> new PomboException("Denuncia nao encontrada."));
+        return complaintRepository.findById(complaintId).orElseThrow(() -> new PomboException("Denúncia não encontrada."));
     }
 
     public void verifyAdmin(String userId) throws PomboException{
-        User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuario nao encontrado."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuário não encontrado."));
 
         if(user.getRole() == Role.USER) {
             throw new PomboException("Usuário não autorizado.");

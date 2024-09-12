@@ -32,19 +32,19 @@ public class PublicationService {
     }
 
     public Publication findById(String id) throws PomboException {
-        return publicationRepository.findById(id).orElseThrow(() -> new PomboException("Publication nao encontrado."));
+        return publicationRepository.findById(id).orElseThrow(() -> new PomboException("Publicação não encontrada."));
     }
 
     public Publication create(Publication publication) throws PomboException {
-        this.userRepository.findById(publication.getUser().getId()).orElseThrow(() -> new PomboException("Usuario invalido."));
+        this.userRepository.findById(publication.getUser().getId()).orElseThrow(() -> new PomboException("Usuário inválido."));
 
         return publicationRepository.save(publication);
     }
 
     // If the publication is already liked, the method will unlike it
     public void like(String userId, String publicationId) throws PomboException {
-        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publication nao encontrado."));
-        User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuario nao encontrado."));
+        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuário não encontrado."));
 
         List<User> likes = publication.getLikes();
 
@@ -62,8 +62,8 @@ public class PublicationService {
     public void block(String userId, String publicationId) throws PomboException{
         verifyAdmin(userId);
 
-        this.complaintRepository.findByPublicationId(publicationId).orElseThrow(() -> new PomboException("O publication não foi denunciado."));
-        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publication nao encontrado."));
+        this.complaintRepository.findByPublicationId(publicationId).orElseThrow(() -> new PomboException("A publicação não foi denunciada."));
+        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada."));
 
         publication.setBlocked(!publication.isBlocked());
 
@@ -83,13 +83,13 @@ public class PublicationService {
     }
 
     public List<User> fetchPublicationLikes(String publicationId) throws PomboException {
-        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publication nao encontrado."));
+        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada."));
 
         return publication.getLikes();
     }
 
     public void verifyAdmin(String userId) throws PomboException{
-        User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuario nao encontrado."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuário não encontrado."));
 
         if(user.getRole() == Role.USER) {
             throw new PomboException("Usuário não autorizado.");
