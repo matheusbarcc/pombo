@@ -1,7 +1,10 @@
 package com.pruu.pombo.service;
 
 import com.pruu.pombo.exception.PomboException;
+import com.pruu.pombo.model.dto.ComplaintDTO;
 import com.pruu.pombo.model.entity.Complaint;
+import com.pruu.pombo.model.entity.Publication;
+import com.pruu.pombo.model.enums.ComplaintStatus;
 import com.pruu.pombo.model.enums.Role;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.ComplaintRepository;
@@ -12,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -47,6 +51,30 @@ public class ComplaintService {
         }
 
         return complaintRepository.findAll(selector, Sort.by(Sort.Direction.DESC, "createdAt"));
+    }
+
+    public List<Complaint> fetchByPublicationId(String userId, String publicationId) throws PomboException {
+        verifyAdmin(userId);
+        List<Complaint> complaints = this.complaintRepository.fetchByPublicationid(publicationId).orElseThrow(() -> new PomboException("A publicação não foi denunciada."));
+        return complaints;
+    }
+
+    public void updateStatus(String complaintId) throws PomboException {
+        verifyAdmin(complaintId);
+        Complaint complaint = this.complaintRepository.findById(complaintId).orElseThrow(() -> new PomboException("Denúncia não encontrada."));
+
+        if(complaint.getStatus() == ComplaintStatus.PENDING) {
+            complaint.setStatus(ComplaintStatus.ANALYSED);
+        } else {
+            complaint.setStatus(ComplaintStatus.PENDING);
+        }
+
+        this.complaintRepository.save(complaint);
+    }
+
+    public ComplaintDTO findDTOByPublicationId(String userId, String publicationId) throws PomboException {
+        // TODO
+        return null;
     }
 
     public boolean delete(String id) {

@@ -1,10 +1,10 @@
 package com.pruu.pombo.model.entity;
 
+import com.pruu.pombo.model.dto.ComplaintDTO;
+import com.pruu.pombo.model.enums.ComplaintStatus;
 import com.pruu.pombo.model.enums.Reason;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
@@ -28,9 +28,23 @@ public class Complaint {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @NotNull
+    @Enumerated(EnumType.STRING)
+    @NotNull(message = "Escolha o motivo da denuncia.")
     private Reason reason;
+
+    @Enumerated(EnumType.STRING)
+    @NotNull
+    private ComplaintStatus status = ComplaintStatus.PENDING;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    public static ComplaintDTO toDTO(Complaint c, Integer complaintAmount, Integer pendingComplaintAmount, Integer analysedComplaintAmount) {
+        return new ComplaintDTO(
+                c.getPublication().getId(),
+                complaintAmount,
+                pendingComplaintAmount,
+                analysedComplaintAmount
+        );
+    }
 }

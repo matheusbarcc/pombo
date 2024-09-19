@@ -1,6 +1,8 @@
 package com.pruu.pombo.service;
 
 import com.pruu.pombo.exception.PomboException;
+import com.pruu.pombo.model.dto.PublicationDTO;
+import com.pruu.pombo.model.entity.Complaint;
 import com.pruu.pombo.model.entity.Publication;
 import com.pruu.pombo.model.enums.Role;
 import com.pruu.pombo.model.entity.User;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -62,7 +65,7 @@ public class PublicationService {
     public void block(String userId, String publicationId) throws PomboException{
         verifyAdmin(userId);
 
-        this.complaintRepository.findByPublicationId(publicationId).orElseThrow(() -> new PomboException("A publicação não foi denunciada."));
+        this.complaintRepository.fetchByPublicationid(publicationId).orElseThrow(() -> new PomboException("A publicação não foi denunciada."));
         Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada."));
 
         publication.setBlocked(!publication.isBlocked());
@@ -86,6 +89,32 @@ public class PublicationService {
         Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada."));
 
         return publication.getLikes();
+    }
+
+    public List<Complaint> fetchPublicationComplaints(String publicationId) throws PomboException {
+        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada."));
+
+        return publication.getComplaints();
+    }
+
+    public List<PublicationDTO> fetchDTO() throws PomboException {
+        List<Publication> publications = this.findAll();
+        List<PublicationDTO> dtos = new ArrayList<>();
+
+        for(Publication p : publications) {
+            Integer likeAmount = this.fetchPublicationLikes(p.getId()).size();
+            Integer complaintAmount = this.fetchPublicationComplaints(p.getId()).size();
+            PublicationDTO dto = Publication.toDTO(p, likeAmount, complaintAmount);
+            dtos.add(dto);
+        }
+
+        return dtos;
+
+//        return publications.stream().map(publication -> {
+//            Integer likeAmount = this.fetchPublicationLikes(publication.getId()).size();
+//            Integer complaintAmount = this.fetchPublicationComplaints(publication.getId()).size();
+//            return Publication.toDTO(publication, likeAmount, complaintAmount);
+//        });
     }
 
     public boolean delete(String id){

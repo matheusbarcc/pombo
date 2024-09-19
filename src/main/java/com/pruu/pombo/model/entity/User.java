@@ -26,6 +26,10 @@ public class User {
     @JsonBackReference
     private List<Publication> publications;
 
+    @OneToMany(mappedBy = "user")
+    @JsonBackReference
+    private List<Complaint> complaints;
+
     @NotBlank
     private String name;
 
@@ -40,7 +44,8 @@ public class User {
     private String cpf;
 
     @Enumerated(EnumType.STRING)
-    private Role role = Role.USER; // If the value is not informed, its default is USER
+    private Role role = Role.USER;
+
 
     @CreationTimestamp
     private LocalDateTime createdAt;

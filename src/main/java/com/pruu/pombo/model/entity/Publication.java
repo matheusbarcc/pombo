@@ -1,5 +1,7 @@
 package com.pruu.pombo.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.pruu.pombo.model.dto.PublicationDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -31,8 +33,24 @@ public class Publication {
     @JoinTable(name = "publication_like", joinColumns = @JoinColumn(name = "publication_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> likes;
 
+    @OneToMany(mappedBy = "publication")
+    @JsonBackReference
+    private List<Complaint> complaints;
+
     private boolean blocked = false;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
+
+    public static PublicationDTO toDTO(Publication p, Integer likeAmount, Integer complaintAmount) {
+        return new PublicationDTO(
+                p.getId(),
+                p.getContent(),
+                p.isBlocked(),
+                p.getUser().getId(),
+                p.getUser().getName(),
+                likeAmount,
+                complaintAmount
+        );
+    }
 }
