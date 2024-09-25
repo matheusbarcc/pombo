@@ -19,7 +19,7 @@ public class ComplaintController {
     private ComplaintService complaintService;
 
     @PostMapping
-    public Complaint create(@Valid @RequestBody Complaint complaint) {
+    public Complaint create(@RequestBody Complaint complaint) throws PomboException {
         return complaintService.create(complaint);
     }
 

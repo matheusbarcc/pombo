@@ -4,6 +4,7 @@ import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.dto.ComplaintDTO;
 import com.pruu.pombo.model.entity.Complaint;
 import com.pruu.pombo.model.enums.ComplaintStatus;
+import com.pruu.pombo.model.enums.Reason;
 import com.pruu.pombo.model.enums.Role;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.ComplaintRepository;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 @Service
@@ -26,7 +28,11 @@ public class ComplaintService {
     @Autowired
     private UserRepository userRepository;
 
-    public Complaint create(Complaint complaint) {
+    public Complaint create(Complaint complaint) throws PomboException {
+        if(complaint.getReason() == null || !EnumSet.allOf(Reason.class).contains(complaint.getReason())) {
+            throw new PomboException("Motivo inválido");
+        }
+
         return complaintRepository.save(complaint);
     }
 
