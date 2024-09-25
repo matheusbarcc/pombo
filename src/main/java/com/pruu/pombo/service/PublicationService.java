@@ -65,8 +65,13 @@ public class PublicationService {
     public void block(String userId, String publicationId) throws PomboException{
         verifyAdmin(userId);
 
-        this.complaintRepository.fetchByPublicationid(publicationId).orElseThrow(() -> new PomboException("A publicação não foi denunciada."));
+        List<Complaint> complaints = this.complaintRepository.findByPublicationId(publicationId);
+
         Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada."));
+
+        if(complaints.isEmpty()) {
+            throw new PomboException("A publicação não foi denunciada");
+        }
 
         publication.setBlocked(!publication.isBlocked());
 

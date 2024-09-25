@@ -54,7 +54,7 @@ public class ComplaintService {
 
     public List<Complaint> fetchByPublicationId(String userId, String publicationId) throws PomboException {
         verifyAdmin(userId);
-        List<Complaint> complaints = this.complaintRepository.fetchByPublicationid(publicationId).orElseThrow(() -> new PomboException("A publicação não foi denunciada."));
+        List<Complaint> complaints = this.complaintRepository.findByPublicationId(publicationId);
         return complaints;
     }
 
@@ -73,7 +73,7 @@ public class ComplaintService {
 
     public ComplaintDTO findDTOByPublicationId(String userId, String publicationId) throws PomboException {
         verifyAdmin(userId);
-        List<Complaint> complaints = this.complaintRepository.fetchByPublicationid(publicationId).orElse(null);
+        List<Complaint> complaints = this.complaintRepository.findByPublicationId(publicationId);
         List<Complaint> pendingComplaintAmount = new ArrayList<>();
         List<Complaint> analysedComplaintAmount = new ArrayList<>();
 
@@ -87,7 +87,7 @@ public class ComplaintService {
             }
         }
 
-        ComplaintDTO dto = Complaint.toDTO(publicationId, complaints.size(), analysedComplaintAmount.size(), analysedComplaintAmount.size());
+        ComplaintDTO dto = Complaint.toDTO(publicationId, complaints.size(), pendingComplaintAmount.size(), analysedComplaintAmount.size());
         return dto;
     }
 

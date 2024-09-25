@@ -43,10 +43,13 @@ public class Publication {
     private LocalDateTime createdAt;
 
     public static PublicationDTO toDTO(Publication p, Integer likeAmount, Integer complaintAmount) {
+        if(p.isBlocked()) {
+            p.setContent("Bloqueado pelo administrador");
+        }
+
         return new PublicationDTO(
                 p.getId(),
                 p.getContent(),
-                p.isBlocked(),
                 p.getUser().getId(),
                 p.getUser().getName(),
                 likeAmount,

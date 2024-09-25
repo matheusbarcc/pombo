@@ -23,11 +23,11 @@ public class User {
     private String id;
 
     @OneToMany(mappedBy = "user")
-    @JsonBackReference
+    @JsonBackReference(value = "user-publications")
     private List<Publication> publications;
 
     @OneToMany(mappedBy = "user")
-    @JsonBackReference
+    @JsonBackReference(value = "user-complaints")
     private List<Complaint> complaints;
 
     @NotBlank

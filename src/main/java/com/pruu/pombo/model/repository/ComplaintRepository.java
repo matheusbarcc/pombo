@@ -6,10 +6,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ComplaintRepository extends JpaRepository<Complaint, String>, JpaSpecificationExecutor<Complaint> {
 
-    Optional<List<Complaint>> fetchByPublicationid(String publicationId);
+    List<Complaint> findByPublicationId(String publicationId);
 }

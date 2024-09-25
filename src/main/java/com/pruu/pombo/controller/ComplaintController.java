@@ -1,6 +1,7 @@
 package com.pruu.pombo.controller;
 
 import com.pruu.pombo.exception.PomboException;
+import com.pruu.pombo.model.dto.ComplaintDTO;
 import com.pruu.pombo.model.entity.Complaint;
 import com.pruu.pombo.model.selector.ComplaintSelector;
 import com.pruu.pombo.service.ComplaintService;
@@ -35,6 +36,11 @@ public class ComplaintController {
     @GetMapping("/{id}")
     public Complaint findById(@PathVariable String id, @RequestParam String userId) throws PomboException {
         return complaintService.findById(id, userId);
+    }
+
+    @GetMapping("/dto")
+    public ComplaintDTO findDTOByPublicationId(@RequestParam String userId, @RequestParam String publicationId) throws PomboException {
+        return complaintService.findDTOByPublicationId(userId, publicationId);
     }
 
     @DeleteMapping("/{id}")

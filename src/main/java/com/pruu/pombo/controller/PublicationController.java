@@ -1,6 +1,7 @@
 package com.pruu.pombo.controller;
 
 import com.pruu.pombo.exception.PomboException;
+import com.pruu.pombo.model.dto.PublicationDTO;
 import com.pruu.pombo.model.entity.Publication;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.selector.PublicationSelector;
@@ -54,6 +55,11 @@ public class PublicationController {
     @GetMapping("/{id}")
     public ResponseEntity<Publication> findById(@PathVariable String id) throws PomboException {
         return ResponseEntity.ok(publicationService.findById(id));
+    }
+
+    @GetMapping("/dto")
+    public List<PublicationDTO> fetchDTO() throws PomboException {
+        return publicationService.fetchDTO();
     }
 
 //    @DeleteMapping("/{id}")
