@@ -3,7 +3,6 @@ package com.pruu.pombo.service;
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.dto.ComplaintDTO;
 import com.pruu.pombo.model.entity.Complaint;
-import com.pruu.pombo.model.entity.Publication;
 import com.pruu.pombo.model.enums.ComplaintStatus;
 import com.pruu.pombo.model.enums.Role;
 import com.pruu.pombo.model.entity.User;
@@ -73,8 +72,23 @@ public class ComplaintService {
     }
 
     public ComplaintDTO findDTOByPublicationId(String userId, String publicationId) throws PomboException {
-        // TODO
-        return null;
+        verifyAdmin(userId);
+        List<Complaint> complaints = this.complaintRepository.fetchByPublicationid(publicationId).orElse(null);
+        List<Complaint> pendingComplaintAmount = new ArrayList<>();
+        List<Complaint> analysedComplaintAmount = new ArrayList<>();
+
+
+        for(Complaint c : complaints) {
+            if(c.getStatus() == ComplaintStatus.PENDING) {
+                pendingComplaintAmount.add(c);
+            }
+            if(c.getStatus() == ComplaintStatus.ANALYSED) {
+                analysedComplaintAmount.add(c);
+            }
+        }
+
+        ComplaintDTO dto = Complaint.toDTO(publicationId, complaints.size(), analysedComplaintAmount.size(), analysedComplaintAmount.size());
+        return dto;
     }
 
     public boolean delete(String id) {

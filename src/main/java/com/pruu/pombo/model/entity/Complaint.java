@@ -39,9 +39,9 @@ public class Complaint {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public static ComplaintDTO toDTO(Complaint c, Integer complaintAmount, Integer pendingComplaintAmount, Integer analysedComplaintAmount) {
+    public static ComplaintDTO toDTO(String publicationId, Integer complaintAmount, Integer pendingComplaintAmount, Integer analysedComplaintAmount) {
         return new ComplaintDTO(
-                c.getPublication().getId(),
+                publicationId,
                 complaintAmount,
                 pendingComplaintAmount,
                 analysedComplaintAmount
