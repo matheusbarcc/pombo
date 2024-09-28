@@ -13,6 +13,7 @@ import com.pruu.pombo.model.selector.PublicationSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -35,19 +36,19 @@ public class PublicationService {
     }
 
     public Publication findById(String id) throws PomboException {
-        return publicationRepository.findById(id).orElseThrow(() -> new PomboException("Publicação não encontrada."));
+        return publicationRepository.findById(id).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
     }
 
     public Publication create(Publication publication) throws PomboException {
-        this.userRepository.findById(publication.getUser().getId()).orElseThrow(() -> new PomboException("Usuário inválido."));
+        this.userRepository.findById(publication.getUser().getId()).orElseThrow(() -> new PomboException("Usuário inválido.", HttpStatus.BAD_REQUEST));
 
         return publicationRepository.save(publication);
     }
 
     // If the publication is already liked, the method will unlike it
     public void like(String userId, String publicationId) throws PomboException {
-        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada."));
-        User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuário não encontrado."));
+        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
+        User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuário não encontrado.", HttpStatus.BAD_REQUEST));
 
         List<User> likes = publication.getLikes();
 
@@ -67,10 +68,10 @@ public class PublicationService {
 
         List<Complaint> complaints = this.complaintRepository.findByPublicationId(publicationId);
 
-        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada."));
+        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
 
         if(complaints.isEmpty()) {
-            throw new PomboException("A publicação não foi denunciada");
+            throw new PomboException("A publicação não foi denunciada", HttpStatus.BAD_REQUEST);
         }
 
         publication.setBlocked(!publication.isBlocked());
@@ -91,13 +92,13 @@ public class PublicationService {
     }
 
     public List<User> fetchPublicationLikes(String publicationId) throws PomboException {
-        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada."));
+        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
 
         return publication.getLikes();
     }
 
     public List<Complaint> fetchPublicationComplaints(String publicationId) throws PomboException {
-        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada."));
+        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
 
         return publication.getComplaints();
     }
@@ -128,10 +129,10 @@ public class PublicationService {
     }
 
     public void verifyAdmin(String userId) throws PomboException{
-        User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuário não encontrado."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuário não encontrado.", HttpStatus.BAD_REQUEST));
 
         if(user.getRole() == Role.USER) {
-            throw new PomboException("Usuário não autorizado.");
+            throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
         }
     }
 }
