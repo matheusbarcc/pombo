@@ -24,8 +24,8 @@ public class UserController {
             description = "Creates a new user, the request must receive at least name, email and CPF in the body",
             responses = {
                 @ApiResponse(responseCode = "200", description = "A new user has been successfully created"),
-                @ApiResponse(responseCode = "400", description = "Wrong or forgotten information on the body")
-                // TODO - Treat error for duplicate entry (email and password)
+                @ApiResponse(responseCode = "400", description = "Wrong or forgotten information on the body"),
+                @ApiResponse(responseCode = "409", description = "Email or CPF already registered")
             })
     @PostMapping
     public User create(@Valid @RequestBody User user) throws PomboException {
@@ -47,8 +47,8 @@ public class UserController {
             description = "Updates a user, the request must receive at least the user id that is being updated",
             responses = {
                     @ApiResponse(responseCode = "200", description = "The user has been successfully updated"),
-                    @ApiResponse(responseCode = "400", description = "Wrong or forgotten information on the body")
-                    // TODO - Treat error for duplicate entry (email and password)
+                    @ApiResponse(responseCode = "400", description = "Wrong or forgotten information on the body"),
+                    @ApiResponse(responseCode = "409", description = "Email or CPF already registered")
             })
     @PutMapping
     public User update(@Valid @RequestBody User user) throws PomboException {

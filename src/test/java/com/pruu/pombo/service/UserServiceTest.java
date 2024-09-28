@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.factories.UserFactory;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.UserRepository;
@@ -42,7 +44,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Should be able to create a new user")
-    public void testCreate$success() {
+    public void testCreate$success() throws PomboException {
         User newUser = new User();
         newUser.setName("New user");
         newUser.setEmail("email@email.com");
@@ -59,7 +61,7 @@ public class UserServiceTest {
 
     @Test
     @DisplayName("Should be able to update a new user")
-    public void testUpdate$success() {
+    public void testUpdate$success() throws PomboException {
         User newUser = new User();
         newUser.setName("New user");
         newUser.setEmail("email@email.com");
