@@ -47,7 +47,8 @@ public class ComplaintService {
         return complaintRepository.findById(complaintId).orElseThrow(() -> new PomboException("Denúncia não encontrada.", HttpStatus.BAD_REQUEST));
     }
 
-    public List<Complaint> fetchWithFilter(ComplaintSelector selector) {
+    public List<Complaint> fetchWithFilter(ComplaintSelector selector, String userId) throws PomboException {
+        verifyAdmin(userId);
         if(selector.hasPagination()) {
             int pageNumber = selector.getPage();
             int pageSize = selector.getLimit();
