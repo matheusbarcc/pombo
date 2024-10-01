@@ -1,11 +1,10 @@
 package com.pruu.pombo.exception;
-import java.util.HashMap;
-import java.util.Map;
 
+import java.util.stream.Collectors;
 import com.pruu.pombo.exception.PomboException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -13,26 +12,38 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    //Solução 2: Interceptar todas as PomboException lançadas
-    //Fonte: https://www.geeksforgeeks.org/exception-handling-in-spring-boot/
+    // Tratamento para PomboException
     @ExceptionHandler(PomboException.class)
     public ResponseEntity<String> handlePomboException(PomboException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(ex.getMessage(), ex.getStatusCode());
     }
 
+    // Tratamento para validações (ex: @Email, @CPF)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap();
+    public ResponseEntity<String> handleValidationExceptions(MethodArgumentNotValidException ex) {
+        // Concatena todas as mensagens de erro com um hífen no início, primeira letra maiúscula e ponto final
+        String errorMessage = ex.getBindingResult().getAllErrors().stream()
+                .map(ObjectError::getDefaultMessage)
+                .map(this::formatMessage)  // Aplica formatação
+                .collect(Collectors.joining("\n")); // Cada erro em uma nova linha
 
-        // Itera sobre os erros de campo e coleta as mensagens
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-
-        return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
     }
 
-    // Outros manipuladores de exceção...
+    // Função auxiliar para capitalizar a primeira letra, adicionar hífen e ponto final
+    private String formatMessage(String message) {
+        if (message == null || message.isEmpty()) {
+            return message;
+        }
+
+        // Capitaliza a primeira letra e adiciona o hífen
+        String formattedMessage = "- " + message.substring(0, 1).toUpperCase() + message.substring(1);
+
+        // Adiciona ponto final se não houver
+        if (!formattedMessage.endsWith(".")) {
+            formattedMessage += ".";
+        }
+
+        return formattedMessage;
+    }
 }

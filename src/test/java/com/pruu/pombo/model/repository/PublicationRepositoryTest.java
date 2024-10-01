@@ -56,11 +56,9 @@ public class PublicationRepositoryTest {
     @DisplayName("Should not be able to insert publication with content bigger than 300 characters")
     public void testInsert$contentMoreThan300Characters() {
         Publication publication = new Publication();
+        String content = "a";
         publication.setUser(user);
-        publication.setContent("Lorem ipsum dolor sit amet consectetur adipisicing elit. Maxime mollitia,\n" +
-                "molestiae quas vel sint commodi repudiandae consequuntur voluptatum laborum\n" +
-                "numquam blanditiis harum quisquam eius sed odit fugiat iusto fuga praesentium\n" +
-                "optio, eaque rerum! Provident similique accusantium nemo autem. Veritatis aa\n");
+        publication.setContent(content.repeat(301));
 
         assertThatThrownBy(() -> publicationRepository.save(publication)).isInstanceOf(Exception.class);
     }

@@ -40,7 +40,7 @@ public class User {
     private String email;
 
     @NotBlank
-    @CPF
+    @CPF(message = "O Cadastro de Pessoa Física (CPF) deve ser válido")
     @Column(unique = true)
     private String cpf;
 

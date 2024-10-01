@@ -1,6 +1,7 @@
 package com.pruu.pombo.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -30,17 +31,17 @@ public class UserServiceTest {
     @InjectMocks
     private UserService userService;
 
-    User user;
-
-    @BeforeEach
-    public void setUp() {
-        user = userRepository.save(UserFactory.createUser());
-    }
-
-    @AfterEach
-    public void tearDown() {
-        userRepository.deleteAll();
-    }
+//    User user;
+//
+//    @BeforeEach
+//    public void setUp() {
+//        user = userRepository.save(UserFactory.createUser());
+//    }
+//
+//    @AfterEach
+//    public void tearDown() {
+//        userRepository.deleteAll();
+//    }
 
     @Test
     @DisplayName("Should be able to create a new user")
@@ -57,6 +58,40 @@ public class UserServiceTest {
         assertThat(result.getName()).isEqualTo(newUser.getName());
         assertThat(result.getEmail()).isEqualTo(newUser.getEmail());
         assertThat(result.getCpf()).isEqualTo(newUser.getCpf());
+    }
+
+    @Test
+    @DisplayName("Should not be able to create a user with same email")
+    public void testCreate$UserWithSameEmail() throws PomboException {
+        User user = UserFactory.createUser();
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(user);
+
+        User newUser = new User();
+        newUser.setName("New user");
+        newUser.setEmail(user.getEmail());
+        newUser.setCpf("43251026046");
+
+        when(userRepository.save(newUser)).thenReturn(newUser);
+
+        assertThatThrownBy(() -> userService.create(newUser)).isInstanceOf(PomboException.class);
+    }
+
+    @Test
+    @DisplayName("Should not be able to create a user with same password")
+    public void testCreate$UserWithSameCpf() throws PomboException {
+        // TODO
+    }
+
+    @Test
+    @DisplayName("Should standardize CPF upon user creation")
+    public void testCpfStandardization$success() throws PomboException {
+        User newUser = new User();
+        newUser.setCpf("432.510.260-46");
+
+        when(userRepository.save(newUser)).thenReturn(newUser);
+        User result = userService.create(newUser);
+
+        assertThat(result.getCpf()).isEqualTo("43251026046");
     }
 
     @Test
@@ -97,6 +132,8 @@ public class UserServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(newUser.getId());
     }
+
+
 
 //    @Test
 //    @DisplayName("Should be able to fetch users using filters")

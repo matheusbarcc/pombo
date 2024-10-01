@@ -19,7 +19,7 @@ public class UserService {
 
     public User create(User user) throws PomboException {
         this.standardizeCpf(user);
-        this.verifyIfUserExists(user);
+//        this.verifyIfUserExists(user);
 
         return userRepository.save(user);
     }
