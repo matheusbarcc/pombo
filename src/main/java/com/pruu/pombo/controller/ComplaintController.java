@@ -8,7 +8,9 @@ import com.pruu.pombo.service.ComplaintService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -81,18 +83,31 @@ public class ComplaintController {
         return complaintService.findDTOByPublicationId(adminId, publicationId);
     }
 
-    @Operation(summary = "Deletes a complaint",
-            description = "Deletes a complaint, the complaint id and the user id must be informed in the request params," +
-                    " only the user who created the complaint has the permission to delete it",
+    @Operation(summary = "Change the status from a specific complaint (ADMIN ONLY)",
+            description = "Change the status from a specific complaint, if the status is PENDING it becomes ANALYSED and vice versa.",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "The complaint has been successfully deleted"),
+                    @ApiResponse(responseCode = "200", description = "The complaint status is updated"),
                     @ApiResponse(responseCode = "400", description = "Complaint not found"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized user")
             })
-    @DeleteMapping("/{id}")
-    public boolean deleteById(@PathVariable String id) {
-        // TODO validate permission
-        return complaintService.delete(id);
+    @PatchMapping("/update-status")
+    public ResponseEntity<Void> updateStatus(@RequestParam String adminId, @RequestParam String complaintId) throws PomboException {
+        complaintService.updateStatus(adminId, complaintId);
+        return ResponseEntity.ok().build();
     }
+
+//    @Operation(summary = "Deletes a complaint",
+//            description = "Deletes a complaint, the complaint id and the user id must be informed in the request params," +
+//                    " only the user who created the complaint has the permission to delete it",
+//            responses = {
+//                    @ApiResponse(responseCode = "200", description = "The complaint has been successfully deleted"),
+//                    @ApiResponse(responseCode = "400", description = "Complaint not found"),
+//                    @ApiResponse(responseCode = "401", description = "Unauthorized user")
+//            })
+////    @DeleteMapping("/{id}")
+////    public boolean deleteById(@PathVariable String id) {
+////        // TODO validate permission
+////        return complaintService.delete(id);
+////    }
 
 }

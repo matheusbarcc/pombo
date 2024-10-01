@@ -66,8 +66,8 @@ public class ComplaintService {
         return complaints;
     }
 
-    public void updateStatus(String complaintId) throws PomboException {
-        verifyAdmin(complaintId);
+    public void updateStatus(String adminId, String complaintId) throws PomboException {
+        verifyAdmin(adminId);
         Complaint complaint = this.complaintRepository.findById(complaintId).orElseThrow(() -> new PomboException("Denúncia não encontrada.", HttpStatus.BAD_REQUEST));
 
         if(complaint.getStatus() == ComplaintStatus.PENDING) {
