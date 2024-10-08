@@ -2,16 +2,19 @@ package com.pruu.pombo.model.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pruu.pombo.factories.UserFactory;
 import com.pruu.pombo.model.entity.User;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
@@ -21,51 +24,35 @@ public class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    User user;
-
-    @BeforeEach
-    public void setUp() {
-        user = userRepository.save(UserFactory.createUser());
-    }
-
-    @AfterEach
-    public void tearDown() {
-        userRepository.deleteAll();
-    }
-
     @Test
-    @DisplayName("Should be able to insert a new user")
-    public void testInsert$success() {
-        User user = new User();
-        user.setName("name");
-        user.setEmail("email@email.com");
-        user.setCpf("43251026046");
-
-        User savedUser = userRepository.save(user);
-
-        assertThat(savedUser.getId()).isNotNull();
-        assertThat(savedUser.getName()).isEqualTo("name");
-    }
-
-    @Test
-    @DisplayName("Should not be able to insert a user with same email")
-    public void testInsert$userWithSameEmail() {
+    @DisplayName("Should not be able to insert a user with invalid email")
+    public void testInsert$userWithInvalidEmail() {
         User savedUser = new User();
-        savedUser.setName("name");
-        savedUser.setEmail(user.getEmail());
-        savedUser.setCpf("43251026046");
+        savedUser.setName("Edson Arantes");
+        savedUser.setEmail("email");
+        savedUser.setCpf("06512329961");
 
-        assertThatThrownBy(() -> userRepository.save(savedUser)).isInstanceOf(Exception.class);
+        try {
+            userRepository.save(savedUser);
+        } catch (Exception e){
+            System.out.println(e.getMessage());
+            assertTrue(e.getMessage().contains("email"));
+        }
+
+        assertThatThrownBy(() ->
+                userRepository.save(savedUser))
+                .isInstanceOf(ConstraintViolationException.class);
     }
 
     @Test
-    @DisplayName("Should not be able to insert a user with same CPF")
-    public void testInsert$userWithSameCpf() {
+    @DisplayName("Should not be able to insert a user with invalid CPF")
+    public void testInsert$userWithInvalidCpf() {
         User savedUser = new User();
         savedUser.setName("name");
         savedUser.setEmail("email@email.com");
-        savedUser.setCpf(user.getCpf());
+        savedUser.setCpf("111111111");
 
-        assertThatThrownBy(() -> userRepository.save(savedUser)).isInstanceOf(Exception.class);
+        assertThatThrownBy(() -> userRepository.save(savedUser)).isInstanceOf(Exception.class)
+                .hasMessageContaining("O CPF deve ser válido.");
     }
 }

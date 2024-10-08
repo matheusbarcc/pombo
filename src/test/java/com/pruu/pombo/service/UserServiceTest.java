@@ -2,16 +2,13 @@ package com.pruu.pombo.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.factories.UserFactory;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.UserRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -73,13 +70,25 @@ public class UserServiceTest {
 
         when(userRepository.save(newUser)).thenReturn(newUser);
 
-        assertThatThrownBy(() -> userService.create(newUser)).isInstanceOf(PomboException.class);
+        assertThatThrownBy(() -> userService.create(newUser)).isInstanceOf(PomboException.class)
+                .hasMessageContaining("Email já cadastrado");
     }
 
     @Test
-    @DisplayName("Should not be able to create a user with same password")
+    @DisplayName("Should not be able to create a user with same cpf")
     public void testCreate$UserWithSameCpf() throws PomboException {
-        // TODO
+        User user = UserFactory.createUser();
+        when(userRepository.findByCpf(user.getCpf())).thenReturn(user);
+
+        User newUser = new User();
+        newUser.setName("New user");
+        newUser.setEmail("newuser@email.com");
+        newUser.setCpf(user.getCpf());
+
+        when(userRepository.save(newUser)).thenReturn(newUser);
+
+        assertThatThrownBy(() -> userService.create(newUser)).isInstanceOf(PomboException.class)
+                .hasMessageContaining("CPF já cadastrado");
     }
 
     @Test
