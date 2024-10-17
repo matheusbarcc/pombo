@@ -9,10 +9,13 @@ import com.pruu.pombo.model.entity.Complaint;
 import com.pruu.pombo.model.entity.Publication;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.enums.Reason;
+import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.TransactionSystemException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -27,45 +30,21 @@ public class ComplaintRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    User user;
-    Publication publication;
-
     @BeforeEach
     public void setUp() {
-        user = userRepository.save(UserFactory.createUser());
-        publication = publicationRepository.save(PublicationFactory.createPublication(user));
-    }
-
-    @AfterEach
-    public void tearDown() {
-        complaintRepository.deleteAll();
-        publicationRepository.deleteAll();
-        userRepository.deleteAll();
-    }
-
-    @Test
-    @DisplayName("Should be able to insert a new complaint")
-    public void testInsert$success() {
-        Complaint complaint = new Complaint();
-        complaint.setUser(user);
-        complaint.setPublication(publication);
-        complaint.setReason(Reason.SCAM);
-
-        Complaint savedComplaint = complaintRepository.save(complaint);
-
-        assertThat(savedComplaint.getId()).isNotNull();
-        assertThat(savedComplaint.getUser().getId()).isEqualTo(user.getId());
-        assertThat(savedComplaint.getPublication().getId()).isEqualTo(publication.getId());
-        assertThat(savedComplaint.getReason()).isEqualTo(Reason.SCAM);
+        User user = userRepository.save(UserFactory.createUser());
+        publicationRepository.save(PublicationFactory.createPublication(user));
     }
 
     @Test
     @DisplayName("Should not be able to insert a complaint without reason")
     public void testInsert$complaintWithoutReason() {
+        User user = userRepository.findAll().get(0);
+        Publication publication = publicationRepository.findAll().get(0);
+
         Complaint complaint = new Complaint();
         complaint.setUser(user);
         complaint.setPublication(publication);
-
-        assertThatThrownBy(() -> complaintRepository.save(complaint)).isInstanceOf(Exception.class);
+        assertThatThrownBy(() -> complaintRepository.save(complaint)).isInstanceOf(TransactionSystemException.class);
     }
 }

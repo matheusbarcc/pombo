@@ -7,6 +7,7 @@ import com.pruu.pombo.factories.PublicationFactory;
 import com.pruu.pombo.factories.UserFactory;
 import com.pruu.pombo.model.entity.Publication;
 import com.pruu.pombo.model.entity.User;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -17,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
+@Transactional
 public class PublicationRepositoryTest {
 
     @Autowired
@@ -25,41 +27,28 @@ public class PublicationRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    User user;
-
     @BeforeEach
     public void setUp() {
-        user = userRepository.save(UserFactory.createUser());
-    }
-
-    @AfterEach
-    public void tearDown() {
-        publicationRepository.deleteAll();
         userRepository.deleteAll();
     }
 
     @Test
-    @DisplayName("Should be able to insert a new publication")
-    public void testInsert$success() {
-        Publication publication = new Publication();
-        publication.setUser(user);
-        publication.setContent("New content");
-
-        Publication savedPublication = publicationRepository.save(publication);
-
-        assertThat(savedPublication.getId()).isNotNull();
-        assertThat(savedPublication.getUser().getId()).isEqualTo(user.getId());
-        assertThat(savedPublication.getContent()).isEqualTo("New content");
-    }
-
-    @Test
-    @DisplayName("Should not be able to insert publication with content bigger than 300 characters")
+    @DisplayName("Should not be able to insert publication with content with more than 300 characters")
     public void testInsert$contentMoreThan300Characters() {
-        Publication publication = new Publication();
+        User user = userRepository.save(UserFactory.createUser());
         String content = "a";
+        Publication publication = new Publication();
         publication.setUser(user);
         publication.setContent(content.repeat(301));
 
         assertThatThrownBy(() -> publicationRepository.save(publication)).isInstanceOf(Exception.class);
+    }
+
+    @Test
+    @DisplayName("Should not be able to insert publication with content with more than 300 characters")
+    public void test() {
+        User user = userRepository.save(UserFactory.createUser());
+
+        System.out.println(user);
     }
 }

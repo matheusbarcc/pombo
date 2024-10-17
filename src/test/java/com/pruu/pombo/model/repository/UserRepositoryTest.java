@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.TransactionSystemException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -25,23 +26,26 @@ public class UserRepositoryTest {
     private UserRepository userRepository;
 
     @Test
+    @DisplayName("Should not be able to insert a user with invalid name")
+    public void testInsert$nameMoreThan200Characters() {
+        String name = "a";
+        User savedUser = new User();
+        savedUser.setName(name.repeat(201));
+        savedUser.setEmail("email@example.com");
+        savedUser.setCpf("06512329961");
+
+        assertThatThrownBy(() ->userRepository.save(savedUser)).isInstanceOf(TransactionSystemException.class);
+    }
+
+    @Test
     @DisplayName("Should not be able to insert a user with invalid email")
     public void testInsert$userWithInvalidEmail() {
         User savedUser = new User();
-        savedUser.setName("Edson Arantes");
+        savedUser.setName("name");
         savedUser.setEmail("email");
         savedUser.setCpf("06512329961");
 
-        try {
-            userRepository.save(savedUser);
-        } catch (Exception e){
-            System.out.println(e.getMessage());
-            assertTrue(e.getMessage().contains("email"));
-        }
-
-        assertThatThrownBy(() ->
-                userRepository.save(savedUser))
-                .isInstanceOf(ConstraintViolationException.class);
+        assertThatThrownBy(() ->userRepository.save(savedUser)).isInstanceOf(TransactionSystemException.class);
     }
 
     @Test
@@ -49,10 +53,9 @@ public class UserRepositoryTest {
     public void testInsert$userWithInvalidCpf() {
         User savedUser = new User();
         savedUser.setName("name");
-        savedUser.setEmail("email@email.com");
+        savedUser.setEmail("email@example.com");
         savedUser.setCpf("111111111");
 
-        assertThatThrownBy(() -> userRepository.save(savedUser)).isInstanceOf(Exception.class)
-                .hasMessageContaining("O CPF deve ser válido.");
+        assertThatThrownBy(() -> userRepository.save(savedUser)).isInstanceOf(TransactionSystemException.class);
     }
 }

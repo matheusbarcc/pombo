@@ -5,6 +5,7 @@ import com.pruu.pombo.model.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -32,6 +33,7 @@ public class User {
     private List<Complaint> complaints;
 
     @NotBlank
+    @Size(max = 200, message = "O nome deve conter no máximo 200 caracteres.")
     private String name;
 
     @NotBlank
