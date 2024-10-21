@@ -6,7 +6,9 @@ import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pruu.pombo.exception.PomboException;
+import com.pruu.pombo.factories.PublicationFactory;
 import com.pruu.pombo.factories.UserFactory;
+import com.pruu.pombo.model.entity.Publication;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +18,8 @@ import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest
@@ -27,18 +31,6 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
-
-//    User user;
-//
-//    @BeforeEach
-//    public void setUp() {
-//        user = userRepository.save(UserFactory.createUser());
-//    }
-//
-//    @AfterEach
-//    public void tearDown() {
-//        userRepository.deleteAll();
-//    }
 
     @Test
     @DisplayName("Should be able to create a new user")
@@ -82,7 +74,7 @@ public class UserServiceTest {
 
         User newUser = new User();
         newUser.setName("New user");
-        newUser.setEmail("newuser@email.com");
+        newUser.setEmail("email@email.com");
         newUser.setCpf(user.getCpf());
 
         when(userRepository.save(newUser)).thenReturn(newUser);
@@ -141,19 +133,4 @@ public class UserServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(newUser.getId());
     }
-
-
-
-//    @Test
-//    @DisplayName("Should be able to fetch users using filters")
-//    public void testFetchWithFilter$success() {
-////        User newUser = new User();
-////        newUser.setId("user-01");
-////
-////        when(userRepository.findById("user-01")).thenReturn(Optional.of(newUser));
-////        User result = userService.findById("user-01");
-////
-////        assertThat(result).isNotNull();
-////        assertThat(result.getId()).isEqualTo(newUser.getId());
-//    }
 }

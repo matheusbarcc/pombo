@@ -15,7 +15,7 @@ public class CPFUtils {
 
         int d2 = calculateDigit(cpfWithD1, 11);
 
-        return String.format("%d%d%d.%d%d%d.%d%d%d-%d%d",
+        return String.format("%d%d%d%d%d%d%d%d%d%d%d",
                 cpf[0], cpf[1], cpf[2],
                 cpf[3], cpf[4], cpf[5],
                 cpf[6], cpf[7], cpf[8],

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.TransactionSystemException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -35,20 +36,12 @@ public class PublicationRepositoryTest {
     @Test
     @DisplayName("Should not be able to insert publication with content with more than 300 characters")
     public void testInsert$contentMoreThan300Characters() {
-        User user = userRepository.save(UserFactory.createUser());
+        User user = UserFactory.createUser();
+        userRepository.save(user);
+        Publication publication = PublicationFactory.createPublication(user);
         String content = "a";
-        Publication publication = new Publication();
-        publication.setUser(user);
-        publication.setContent(content.repeat(301));
+        publication.setContent(content.repeat(310));
 
-        assertThatThrownBy(() -> publicationRepository.save(publication)).isInstanceOf(Exception.class);
-    }
-
-    @Test
-    @DisplayName("Should not be able to insert publication with content with more than 300 characters")
-    public void test() {
-        User user = userRepository.save(UserFactory.createUser());
-
-        System.out.println(user);
+        assertThatThrownBy(() -> publicationRepository.save(publication)).isInstanceOf(TransactionSystemException.class);
     }
 }

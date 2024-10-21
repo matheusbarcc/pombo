@@ -2,15 +2,9 @@ package com.pruu.pombo.model.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.pruu.pombo.factories.UserFactory;
 import com.pruu.pombo.model.entity.User;
-import jakarta.validation.ConstraintViolationException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +23,10 @@ public class UserRepositoryTest {
     @DisplayName("Should not be able to insert a user with invalid name")
     public void testInsert$nameMoreThan200Characters() {
         String name = "a";
-        User savedUser = new User();
-        savedUser.setName(name.repeat(201));
-        savedUser.setEmail("email@example.com");
-        savedUser.setCpf("06512329961");
+        User user = UserFactory.createUser();
+        user.setName(name.repeat(201));
 
-        assertThatThrownBy(() ->userRepository.save(savedUser)).isInstanceOf(TransactionSystemException.class);
+        assertThatThrownBy(() ->userRepository.save(user)).isInstanceOf(TransactionSystemException.class);
     }
 
     @Test
