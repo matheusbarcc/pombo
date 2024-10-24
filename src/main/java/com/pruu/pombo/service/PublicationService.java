@@ -31,6 +31,12 @@ public class PublicationService {
     @Autowired
     private ComplaintRepository complaintRepository;
 
+    public Publication create(Publication publication) throws PomboException {
+        this.userRepository.findById(publication.getUser().getId()).orElseThrow(() -> new PomboException("Usuário inválido.", HttpStatus.BAD_REQUEST));
+
+        return publicationRepository.save(publication);
+    }
+
     public List<Publication> findAll() {
         return publicationRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
@@ -39,13 +45,8 @@ public class PublicationService {
         return publicationRepository.findById(id).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
     }
 
-    public Publication create(Publication publication) throws PomboException {
-        this.userRepository.findById(publication.getUser().getId()).orElseThrow(() -> new PomboException("Usuário inválido.", HttpStatus.BAD_REQUEST));
 
-        return publicationRepository.save(publication);
-    }
-
-    // If the publication is already liked, the method will unlike it
+    // if the publication is already liked, the method will unlike it
     public void like(String userId, String publicationId) throws PomboException {
         Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
         User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuário não encontrado.", HttpStatus.BAD_REQUEST));
@@ -62,7 +63,7 @@ public class PublicationService {
         publicationRepository.save(publication);
     }
 
-    // If the publication is already blocked, the method will unblock it
+    // if the publication is already blocked, the method will unblock it
     public void block(String userId, String publicationId) throws PomboException{
         verifyAdmin(userId);
 
@@ -115,12 +116,6 @@ public class PublicationService {
         }
 
         return dtos;
-
-//        return publications.stream().map(publication -> {
-//            Integer likeAmount = this.fetchPublicationLikes(publication.getId()).size();
-//            Integer complaintAmount = this.fetchPublicationComplaints(publication.getId()).size();
-//            return Publication.toDTO(publication, likeAmount, complaintAmount);
-//        });
     }
 
     public boolean delete(String id){

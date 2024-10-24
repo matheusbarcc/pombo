@@ -1,6 +1,6 @@
 package com.pruu.pombo.utils;
 
-public class CPFUtils {
+public class CpfGenerator {
     public static String generateValidCPF() {
         int[] cpf = new int[9];
         for (int i = 0; i < 9; i++) {

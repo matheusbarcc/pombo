@@ -1,7 +1,7 @@
 package com.pruu.pombo.factories;
 
 import com.pruu.pombo.model.entity.User;
-import com.pruu.pombo.utils.CPFUtils;
+import com.pruu.pombo.utils.CpfGenerator;
 
 import java.util.UUID;
 
@@ -10,7 +10,7 @@ public class UserFactory {
         User u = new User();
         u.setName("Name");
         u.setEmail(UUID.randomUUID() + "@example.com");
-        u.setCpf(CPFUtils.generateValidCPF());
+        u.setCpf(CpfGenerator.generateValidCPF());
         return u;
     }
 }

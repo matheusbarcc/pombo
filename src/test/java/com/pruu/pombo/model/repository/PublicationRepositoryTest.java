@@ -8,6 +8,7 @@ import com.pruu.pombo.factories.UserFactory;
 import com.pruu.pombo.model.entity.Publication;
 import com.pruu.pombo.model.entity.User;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,19 +29,27 @@ public class PublicationRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @BeforeEach
-    public void setUp() {
+    @AfterEach
+    public void tearDown() {
         userRepository.deleteAll();
     }
 
     @Test
-    @DisplayName("Should not be able to insert publication with content with more than 300 characters")
+    @DisplayName("Should not be able to insert publication with content bigger than 300 characters")
     public void testInsert$contentMoreThan300Characters() {
         User user = UserFactory.createUser();
         userRepository.save(user);
         Publication publication = PublicationFactory.createPublication(user);
         String content = "a";
-        publication.setContent(content.repeat(310));
+        publication.setContent(content.repeat(301));
+//        publication.setContent("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
+//                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
+//                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
+//                "aaaaaaaaaaaaaa");
+
+//        Publication result = publicationRepository.save(publication);
+//
+//        System.out.println(result);
 
         assertThatThrownBy(() -> publicationRepository.save(publication)).isInstanceOf(TransactionSystemException.class);
     }
