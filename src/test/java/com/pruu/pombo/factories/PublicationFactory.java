@@ -14,6 +14,7 @@ public class PublicationFactory {
         p.setUser(user);
         p.setContent(UUID.randomUUID().toString());
         p.setLikes(new ArrayList<>());
+        p.setComplaints(new ArrayList<>());
 
         return p;
     }

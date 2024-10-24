@@ -111,7 +111,7 @@ public class PublicationController {
             })
     @GetMapping("/dto")
     public List<PublicationDTO> fetchDTO() throws PomboException {
-        return publicationService.fetchDTO();
+        return publicationService.fetchDTOs();
     }
 
 //    @DeleteMapping("/{id}")

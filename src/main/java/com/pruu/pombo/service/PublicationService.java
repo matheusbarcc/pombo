@@ -104,7 +104,7 @@ public class PublicationService {
         return publication.getComplaints();
     }
 
-    public List<PublicationDTO> fetchDTO() throws PomboException {
+    public List<PublicationDTO> fetchDTOs() throws PomboException {
         List<Publication> publications = this.findAll();
         List<PublicationDTO> dtos = new ArrayList<>();
 

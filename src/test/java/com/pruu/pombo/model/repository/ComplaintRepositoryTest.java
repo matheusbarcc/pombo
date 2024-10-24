@@ -30,21 +30,19 @@ public class ComplaintRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @BeforeEach
-    public void setUp() {
-        User user = userRepository.save(UserFactory.createUser());
-        publicationRepository.save(PublicationFactory.createPublication(user));
-    }
-
     @Test
     @DisplayName("Should not be able to insert a complaint without reason")
     public void testInsert$complaintWithoutReason() {
-        User user = userRepository.findAll().get(0);
-        Publication publication = publicationRepository.findAll().get(0);
+        User user = UserFactory.createUser();
+        Publication publication = PublicationFactory.createPublication(user);
+
+        userRepository.saveAndFlush(user);
+        publicationRepository.saveAndFlush(publication);
 
         Complaint complaint = new Complaint();
         complaint.setUser(user);
         complaint.setPublication(publication);
-        assertThatThrownBy(() -> complaintRepository.save(complaint)).isInstanceOf(TransactionSystemException.class);
+        assertThatThrownBy(() -> complaintRepository.saveAndFlush(complaint)).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("Escolha o motivo da denuncia");
     }
 }

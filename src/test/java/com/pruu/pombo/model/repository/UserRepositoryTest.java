@@ -1,16 +1,15 @@
 package com.pruu.pombo.model.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.pruu.pombo.factories.UserFactory;
 import com.pruu.pombo.model.entity.User;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.TransactionSystemException;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -26,7 +25,8 @@ public class UserRepositoryTest {
         User user = UserFactory.createUser();
         user.setName(name.repeat(201));
 
-        assertThatThrownBy(() ->userRepository.save(user)).isInstanceOf(TransactionSystemException.class);
+        assertThatThrownBy(() -> userRepository.saveAndFlush(user)).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("O nome deve conter no máximo 200 caracteres");
     }
 
     @Test
@@ -37,7 +37,8 @@ public class UserRepositoryTest {
         savedUser.setEmail("email");
         savedUser.setCpf("06512329961");
 
-        assertThatThrownBy(() ->userRepository.save(savedUser)).isInstanceOf(TransactionSystemException.class);
+        assertThatThrownBy(() ->userRepository.saveAndFlush(savedUser)).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("O email deve ser válido");
     }
 
     @Test
@@ -48,6 +49,7 @@ public class UserRepositoryTest {
         savedUser.setEmail("email@example.com");
         savedUser.setCpf("111111111");
 
-        assertThatThrownBy(() -> userRepository.save(savedUser)).isInstanceOf(TransactionSystemException.class);
+        assertThatThrownBy(() -> userRepository.saveAndFlush(savedUser)).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("O CPF deve ser válido");
     }
 }

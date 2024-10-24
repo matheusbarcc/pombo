@@ -8,6 +8,7 @@ import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.factories.UserFactory;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.UserRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,6 +27,11 @@ public class UserServiceTest {
 
     @InjectMocks
     private UserService userService;
+
+    @AfterEach
+    public void tearDown() {
+        userRepository.deleteAll();
+    }
 
     @Test
     @DisplayName("Should be able to create a new user")

@@ -20,7 +20,6 @@ import org.springframework.transaction.TransactionSystemException;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Transactional
 public class PublicationRepositoryTest {
 
     @Autowired
@@ -28,11 +27,6 @@ public class PublicationRepositoryTest {
 
     @Autowired
     private UserRepository userRepository;
-
-    @AfterEach
-    public void tearDown() {
-        userRepository.deleteAll();
-    }
 
     @Test
     @DisplayName("Should not be able to insert publication with content bigger than 300 characters")
@@ -42,15 +36,8 @@ public class PublicationRepositoryTest {
         Publication publication = PublicationFactory.createPublication(user);
         String content = "a";
         publication.setContent(content.repeat(301));
-//        publication.setContent("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
-//                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
-//                "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" +
-//                "aaaaaaaaaaaaaa");
 
-//        Publication result = publicationRepository.save(publication);
-//
-//        System.out.println(result);
-
-        assertThatThrownBy(() -> publicationRepository.save(publication)).isInstanceOf(TransactionSystemException.class);
+        assertThatThrownBy(() -> publicationRepository.saveAndFlush(publication)).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("O conteúdo do Pruu deve conter no máximo 300 caracteres");
     }
 }
