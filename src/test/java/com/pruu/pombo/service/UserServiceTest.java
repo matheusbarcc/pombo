@@ -33,6 +33,8 @@ public class UserServiceTest {
         userRepository.deleteAll();
     }
 
+    // CREATE TESTS
+
     @Test
     @DisplayName("Should be able to create a new user")
     public void testCreate$success() throws PomboException {
@@ -83,6 +85,8 @@ public class UserServiceTest {
                 .hasMessageContaining("CPF já cadastrado");
     }
 
+    // FETCH TESTS
+
     @Test
     @DisplayName("Should be able to find a user by id")
     public void testFindById$success() {
@@ -97,6 +101,8 @@ public class UserServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(newUser.getId());
     }
+
+    // UPDATE TESTS
 
     @Test
     @DisplayName("Should be able to update a new user")

@@ -30,6 +30,7 @@ public class ComplaintService {
     private UserRepository userRepository;
 
     public Complaint create(Complaint complaint) throws PomboException {
+        userRepository.findById(complaint.getUser().getId()).orElseThrow(() -> new PomboException("Usuário inválido.", HttpStatus.BAD_REQUEST));
         if(complaint.getReason() == null || !EnumSet.allOf(Reason.class).contains(complaint.getReason())) {
             throw new PomboException("Motivo inválido", HttpStatus.BAD_REQUEST);
         }

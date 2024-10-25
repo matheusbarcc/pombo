@@ -17,15 +17,14 @@ import com.pruu.pombo.model.repository.ComplaintRepository;
 import com.pruu.pombo.model.repository.PublicationRepository;
 import com.pruu.pombo.model.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,6 +45,15 @@ public class PublicationServiceTest {
     @InjectMocks
     private PublicationService publicationService;
 
+    User user;
+
+    @BeforeEach
+    void setUp() {
+        user = UserFactory.createUser();
+        user.setId("user-01");
+        when(userRepository.findById("user-01")).thenReturn(Optional.of(user));
+    }
+
     @AfterEach
     public void tearDown() {
         publicationRepository.deleteAll();
@@ -57,11 +65,8 @@ public class PublicationServiceTest {
     @Test
     @DisplayName("Should be able to create a new publication")
     public void testCreate$success() throws PomboException {
-        User user = UserFactory.createUser();
-        user.setId("user-01");
         Publication publication = PublicationFactory.createPublication(user);
 
-        when(userRepository.findById("user-01")).thenReturn(Optional.of(user));
         when(publicationRepository.save(publication)).thenReturn(publication);
         Publication result = publicationService.create(publication);
 
@@ -73,8 +78,8 @@ public class PublicationServiceTest {
     @Test
     @DisplayName("Should not be able to create a publication with invalid user")
     public void testCreate$invalidUser() {
-        User user = new User();
-        Publication publication = PublicationFactory.createPublication(user);
+        User user2 = new User();
+        Publication publication = PublicationFactory.createPublication(user2);
 
         when(publicationRepository.save(publication)).thenReturn(publication);
 
@@ -92,12 +97,9 @@ public class PublicationServiceTest {
     @Test
     @DisplayName("Should be able to like/dislike a publication")
     public void testLikeDislike$success() throws PomboException {
-        User user = UserFactory.createUser();
-        user.setId("user-01");
         Publication publication = PublicationFactory.createPublication(user);
         publication.setId("publication-01");
 
-        when(userRepository.findById("user-01")).thenReturn(Optional.of(user));
         when(publicationRepository.findById("publication-01")).thenReturn(Optional.of(publication));
 
         when(publicationRepository.save(publication)).thenReturn(publication);
@@ -139,11 +141,6 @@ public class PublicationServiceTest {
     @Test
     @DisplayName("Should not be able to like a invalid publication")
     public void testLike$invalidPublication() {
-        User user = UserFactory.createUser();
-        user.setId("user-01");
-
-        when(userRepository.findById("user-01")).thenReturn(Optional.of(user));
-
         assertThatThrownBy(() -> publicationService.like("user-01", "publication-01"))
                 .isInstanceOf(PomboException.class).hasMessageContaining("Publicação não encontrada");
     }
@@ -158,18 +155,18 @@ public class PublicationServiceTest {
     @Test
     @DisplayName("Should be able to block/unblock a publication")
     public void testBlockUnblock$success() throws PomboException {
-        User user = UserFactory.createUser();
-        user.setId("user-01");
-        user.setRole(Role.ADMIN);
+        User admin = UserFactory.createUser();
+        admin.setId("admin-01");
+        admin.setRole(Role.ADMIN);
 
-        Publication publication = PublicationFactory.createPublication(user);
+        Publication publication = PublicationFactory.createPublication(admin);
         publication.setId("publication-01");
 
-        Complaint complaint = ComplaintFactory.createComplaint(user, publication);
+        Complaint complaint = ComplaintFactory.createComplaint(admin, publication);
         List<Complaint> complaints = new ArrayList<>();
         complaints.add(complaint);
 
-        when(userRepository.findById("user-01")).thenReturn(Optional.of(user));
+        when(userRepository.findById("admin-01")).thenReturn(Optional.of(admin));
         when(publicationRepository.findById("publication-01")).thenReturn(Optional.of(publication));
         when(complaintRepository.findByPublicationId("publication-01")).thenReturn(complaints);
         when(publicationRepository.save(publication)).thenReturn(publication);
@@ -177,11 +174,11 @@ public class PublicationServiceTest {
             the creator of the publication blocking their own publication,
             doesnt make sense but it will validate the blocking feature anyway
         */
-        publicationService.block("user-01", "publication-01");
+        publicationService.block("admin-01", "publication-01");
 
         assertThat(publication.isBlocked()).isTrue();
 
-        publicationService.block("user-01", "publication-01");
+        publicationService.block("admin-01", "publication-01");
 
         assertThat(publication.isBlocked()).isFalse();
     }
@@ -189,9 +186,6 @@ public class PublicationServiceTest {
     @Test
     @DisplayName("Should be able to fetch complaints from a specific publication")
     public void testFetchComplaints$success() throws PomboException {
-        User user = UserFactory.createUser();
-        user.setId("user-01");
-
         Publication publication = PublicationFactory.createPublication(user);
         publication.setId("publication-01");
 
@@ -215,10 +209,6 @@ public class PublicationServiceTest {
     @Test
     @DisplayName("Should not be able to block a publication without a admin role")
     public void testBlockUnblock$withoutAdminRole(){
-        User user = UserFactory.createUser();
-        user.setId("user-01");
-        user.setRole(Role.USER);
-
         Publication publication = PublicationFactory.createPublication(user);
         publication.setId("publication-01");
 
@@ -226,7 +216,6 @@ public class PublicationServiceTest {
         List<Complaint> complaints = new ArrayList<>();
         complaints.add(complaint);
 
-        when(userRepository.findById("user-01")).thenReturn(Optional.of(user));
         when(publicationRepository.findById("publication-01")).thenReturn(Optional.of(publication));
         when(complaintRepository.findByPublicationId("publication-01")).thenReturn(complaints);
         when(publicationRepository.save(publication)).thenReturn(publication);
@@ -239,18 +228,18 @@ public class PublicationServiceTest {
     @Test
     @DisplayName("Should not be able to block a publication without at least one complaint")
     public void testBlockUnblock$withoutComplaint(){
-        User user = UserFactory.createUser();
-        user.setId("user-01");
-        user.setRole(Role.ADMIN);
+        User admin = UserFactory.createUser();
+        admin.setId("admin-01");
+        admin.setRole(Role.ADMIN);
 
-        Publication publication = PublicationFactory.createPublication(user);
+        Publication publication = PublicationFactory.createPublication(admin);
         publication.setId("publication-01");
 
-        when(userRepository.findById("user-01")).thenReturn(Optional.of(user));
+        when(userRepository.findById("admin-01")).thenReturn(Optional.of(admin));
         when(publicationRepository.findById("publication-01")).thenReturn(Optional.of(publication));
         when(publicationRepository.save(publication)).thenReturn(publication);
 
-        assertThatThrownBy(() -> publicationService.block("user-01", "publication-01"))
+        assertThatThrownBy(() -> publicationService.block("admin-01", "publication-01"))
                 .isInstanceOf(PomboException.class).hasMessageContaining("A publicação não foi denunciada");
     }
 
