@@ -60,12 +60,6 @@ public class ComplaintService {
         return complaintRepository.findAll(selector, Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
-    public List<Complaint> fetchByPublicationId(String userId, String publicationId) throws PomboException {
-        verifyAdmin(userId);
-        List<Complaint> complaints = this.complaintRepository.findByPublicationId(publicationId);
-        return complaints;
-    }
-
     public void updateStatus(String adminId, String complaintId) throws PomboException {
         verifyAdmin(adminId);
         Complaint complaint = this.complaintRepository.findById(complaintId).orElseThrow(() -> new PomboException("Denúncia não encontrada.", HttpStatus.BAD_REQUEST));
@@ -82,20 +76,20 @@ public class ComplaintService {
     public ComplaintDTO findDTOByPublicationId(String userId, String publicationId) throws PomboException {
         verifyAdmin(userId);
         List<Complaint> complaints = this.complaintRepository.findByPublicationId(publicationId);
-        List<Complaint> pendingComplaintAmount = new ArrayList<>();
-        List<Complaint> analysedComplaintAmount = new ArrayList<>();
+        int pendingComplaintAmount = 0;
+        int analysedComplaintAmount = 0;
 
 
         for(Complaint c : complaints) {
             if(c.getStatus() == ComplaintStatus.PENDING) {
-                pendingComplaintAmount.add(c);
+                pendingComplaintAmount++;
             }
             if(c.getStatus() == ComplaintStatus.ANALYSED) {
-                analysedComplaintAmount.add(c);
+                analysedComplaintAmount++;
             }
         }
 
-        ComplaintDTO dto = Complaint.toDTO(publicationId, complaints.size(), pendingComplaintAmount.size(), analysedComplaintAmount.size());
+        ComplaintDTO dto = Complaint.toDTO(publicationId, complaints.size(), pendingComplaintAmount, analysedComplaintAmount);
         return dto;
     }
 
