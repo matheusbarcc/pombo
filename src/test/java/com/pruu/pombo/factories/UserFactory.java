@@ -11,6 +11,7 @@ public class UserFactory {
         u.setName("Name");
         u.setEmail(UUID.randomUUID() + "@example.com");
         u.setCpf(CpfGenerator.generateValidCPF());
+        u.setPassword("123");
         return u;
     }
 }

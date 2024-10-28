@@ -1,5 +1,6 @@
 package com.pruu.pombo.model.repository;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.pruu.pombo.factories.UserFactory;
@@ -32,10 +33,8 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("Should not be able to insert a user with invalid email")
     public void testInsert$userWithInvalidEmail() {
-        User savedUser = new User();
-        savedUser.setName("name");
-        savedUser.setEmail("email");
-        savedUser.setCpf("06512329961");
+        User savedUser = UserFactory.createUser();
+        savedUser.setEmail("aaaaaaa");
 
         assertThatThrownBy(() ->userRepository.saveAndFlush(savedUser)).isInstanceOf(ConstraintViolationException.class)
                 .hasMessageContaining("O email deve ser válido");
@@ -44,12 +43,20 @@ public class UserRepositoryTest {
     @Test
     @DisplayName("Should not be able to insert a user with invalid CPF")
     public void testInsert$userWithInvalidCpf() {
-        User savedUser = new User();
-        savedUser.setName("name");
-        savedUser.setEmail("email@example.com");
-        savedUser.setCpf("111111111");
+        User savedUser = UserFactory.createUser();
+        savedUser.setCpf("11111111111");
 
         assertThatThrownBy(() -> userRepository.saveAndFlush(savedUser)).isInstanceOf(ConstraintViolationException.class)
                 .hasMessageContaining("O CPF deve ser válido");
+    }
+
+    @Test
+    @DisplayName("Should not be able to insert a user without password")
+    public void testInsert$userWithoutPassword() {
+        User savedUser = UserFactory.createUser();
+        savedUser.setPassword(null);
+
+        assertThatThrownBy(() -> userRepository.saveAndFlush(savedUser)).isInstanceOf(ConstraintViolationException.class)
+                .hasMessageContaining("A senha não deve estar em branco.");
     }
 }

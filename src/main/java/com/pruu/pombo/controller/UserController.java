@@ -20,18 +20,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Operation(summary = "Creates a new user",
-            description = "Creates a new user, the request must receive at least name, email and CPF in the body",
-            responses = {
-                @ApiResponse(responseCode = "200", description = "A new user has been successfully created"),
-                @ApiResponse(responseCode = "400", description = "Wrong or forgotten information on the body"),
-                @ApiResponse(responseCode = "409", description = "Email or CPF already registered")
-            })
-    @PostMapping
-    public User create(@Valid @RequestBody User user) throws PomboException {
-        return userService.create(user);
-    }
-
     @Operation(summary = "Fetches users with filters",
             description = "Fetches a group of users based on a filter passed through the body, pagination also included",
             responses = {

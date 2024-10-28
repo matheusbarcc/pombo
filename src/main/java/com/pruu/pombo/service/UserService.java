@@ -7,15 +7,24 @@ import com.pruu.pombo.model.selector.UserSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado " + username));
+    }
 
     public User create(User user) throws PomboException {
         this.standardizeCpf(user);
@@ -58,15 +67,17 @@ public class UserService {
     }
 
     public void verifyIfUserExists(User user) throws PomboException {
-        User userWithSameEmail = userRepository.findByEmail(user.getEmail());
+        Optional<User> userWithSameEmail = userRepository.findByEmail(user.getEmail());
         User userWithSameCpf = userRepository.findByCpf(user.getCpf());
 
         if(user.getId() == null) {
             user.setId("");
         }
 
-        if(userWithSameEmail != null && !user.getId().equals(userWithSameEmail.getId())) {
-            throw new PomboException("Email já cadastrado.", HttpStatus.CONFLICT);
+        if(userWithSameEmail.isPresent()) {
+            if (!user.getId().equals(userWithSameEmail.get().getId())) {
+                throw new PomboException("Email já cadastrado.", HttpStatus.CONFLICT);
+            }
         }
 
         if(userWithSameCpf != null && !user.getId().equals(userWithSameCpf.getId())) {

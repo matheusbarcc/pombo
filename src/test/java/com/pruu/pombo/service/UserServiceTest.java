@@ -55,7 +55,7 @@ public class UserServiceTest {
     @DisplayName("Should not be able to create a user with same email")
     public void testCreate$userWithSameEmail() {
         User user = UserFactory.createUser();
-        when(userRepository.findByEmail(user.getEmail())).thenReturn(user);
+        when(userRepository.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
 
         User newUser = new User();
         newUser.setName("New user");

@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    //Solução 2: Interceptar todas as PomboException lançadas
-    //Fonte: https://www.geeksforgeeks.org/exception-handling-in-spring-boot/
     @ExceptionHandler(PomboException.class)
     public ResponseEntity<String> handlePomboException(PomboException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
@@ -23,7 +21,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap();
 
-        // Itera sobre os erros de campo e coleta as mensagens
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
@@ -32,6 +29,4 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
-
-    // Outros manipuladores de exceção...
 }
