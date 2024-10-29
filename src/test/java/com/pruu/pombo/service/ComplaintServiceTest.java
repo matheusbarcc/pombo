@@ -116,23 +116,25 @@ class ComplaintServiceTest {
         complaint.setId("complaint-01");
 
         when(complaintRepository.findById("complaint-01")).thenReturn(Optional.of(complaint));
-        complaintService.updateStatus("complaint-01");
+        complaintService.updateStatus("complaint-01", ComplaintStatus.ACCEPTED);
 
-        assertThat(complaint.getStatus()).isEqualTo(ComplaintStatus.ANALYSED);
+        assertThat(complaint.getStatus()).isEqualTo(ComplaintStatus.ACCEPTED);
+        assertThat(complaint.getPublication().isBlocked()).isTrue();
 
-        complaintService.updateStatus("complaint-01");
+        complaintService.updateStatus("complaint-01", ComplaintStatus.REJECTED);
 
-        assertThat(complaint.getStatus()).isEqualTo(ComplaintStatus.PENDING);
+        assertThat(complaint.getStatus()).isEqualTo(ComplaintStatus.REJECTED);
+        assertThat(complaint.getPublication().isBlocked()).isFalse();
     }
 
     // DTO TESTS
 
     @Test
     @DisplayName("Should be able to find DTO by publication id")
-    public void testFindDTO$success() throws PomboException {
+    public void testFindDTO$success() {
         Complaint complaint1 = ComplaintFactory.createComplaint(user, publication);
         complaint1.setId("complaint-01");
-        complaint1.setStatus(ComplaintStatus.ANALYSED);
+        complaint1.setStatus(ComplaintStatus.REJECTED);
         Complaint complaint2 = ComplaintFactory.createComplaint(user, publication);
         complaint2.setId("complaint-02");
 
@@ -146,7 +148,8 @@ class ComplaintServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getComplaintAmount()).isEqualTo(2);
         assertThat(result.getPendingComplaintAmount()).isEqualTo(1);
-        assertThat(result.getAnalysedComplaintAmount()).isEqualTo(1);
+        assertThat(result.getAcceptedComplaintAmount()).isEqualTo(0);
+        assertThat(result.getRejectedComplaintAmount()).isEqualTo(1);
     }
 
 }

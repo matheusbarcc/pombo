@@ -133,43 +133,7 @@ public class PublicationServiceTest {
                 .isInstanceOf(PomboException.class).hasMessageContaining("Publicação não encontrada");
     }
 
-    // BLOCK TESTS
-
-    /*
-        the blocking feature works like a switch, when called once it will block the publication
-        if called again with the same publication id it will unblock it, for this reason it was
-        created only one test for both cases
-     */
-    @Test
-    @DisplayName("Should be able to block/unblock a publication")
-    public void testBlockUnblock$success() throws PomboException {
-        User admin = UserFactory.createUser();
-        admin.setId("admin-01");
-        admin.setRole(Role.ADMIN);
-
-        Publication publication = PublicationFactory.createPublication(admin);
-        publication.setId("publication-01");
-
-        Complaint complaint = ComplaintFactory.createComplaint(admin, publication);
-        List<Complaint> complaints = new ArrayList<>();
-        complaints.add(complaint);
-
-        when(userRepository.findById("admin-01")).thenReturn(Optional.of(admin));
-        when(publicationRepository.findById("publication-01")).thenReturn(Optional.of(publication));
-        when(complaintRepository.findByPublicationId("publication-01")).thenReturn(complaints);
-        when(publicationRepository.save(publication)).thenReturn(publication);
-        /*
-            the creator of the publication blocking their own publication,
-            doesnt make sense but it will validate the blocking feature anyway
-        */
-        publicationService.block("publication-01");
-
-        assertThat(publication.isBlocked()).isTrue();
-
-        publicationService.block("publication-01");
-
-        assertThat(publication.isBlocked()).isFalse();
-    }
+    // COMPLAINTS TEST
 
     @Test
     @DisplayName("Should be able to fetch complaints from a specific publication")
@@ -192,24 +156,6 @@ public class PublicationServiceTest {
         assertThat(result.size()).isEqualTo(2);
         assertThat(result.get(0)).isEqualTo(complaint1);
         assertThat(result.get(1)).isEqualTo(complaint2);
-    }
-
-    @Test
-    @DisplayName("Should not be able to block a publication without at least one complaint")
-    public void testBlockUnblock$withoutComplaint(){
-        User admin = UserFactory.createUser();
-        admin.setId("admin-01");
-        admin.setRole(Role.ADMIN);
-
-        Publication publication = PublicationFactory.createPublication(admin);
-        publication.setId("publication-01");
-
-        when(userRepository.findById("admin-01")).thenReturn(Optional.of(admin));
-        when(publicationRepository.findById("publication-01")).thenReturn(Optional.of(publication));
-        when(publicationRepository.save(publication)).thenReturn(publication);
-
-        assertThatThrownBy(() -> publicationService.block("publication-01"))
-                .isInstanceOf(PomboException.class).hasMessageContaining("A publicação não foi denunciada");
     }
 
     // DTO TESTS

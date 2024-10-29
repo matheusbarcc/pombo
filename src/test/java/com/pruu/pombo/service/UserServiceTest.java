@@ -108,10 +108,12 @@ public class UserServiceTest {
     @DisplayName("Should be able to update a new user")
     public void testUpdate$success() throws PomboException {
         User newUser = new User();
+        newUser.setId("user-01");
         newUser.setName("New user");
         newUser.setEmail("email@email.com");
         newUser.setCpf("43251026046");
 
+        when(userRepository.findById("user-01")).thenReturn(Optional.of(newUser));
         when(userRepository.save(newUser)).thenReturn(newUser);
         User savedNewUser = userService.create(newUser);
 
