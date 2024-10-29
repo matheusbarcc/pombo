@@ -5,6 +5,7 @@ import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.dto.ComplaintDTO;
 import com.pruu.pombo.model.entity.Complaint;
 import com.pruu.pombo.model.entity.User;
+import com.pruu.pombo.model.enums.ComplaintStatus;
 import com.pruu.pombo.model.enums.Role;
 import com.pruu.pombo.model.selector.ComplaintSelector;
 import com.pruu.pombo.service.ComplaintService;
@@ -124,18 +125,28 @@ public class ComplaintController {
     }
 
     @Operation(summary = "Change the status from a specific complaint (ADMIN ONLY)",
-            description = "Change the status from a specific complaint, if the status is PENDING it becomes ANALYSED and vice versa.",
+            description = "Change the status from a specific complaint, if the new status is ACCEPTED, the publication " +
+                    "the complaint will be blocked, if changed back to REJECTED or PENDING, the publication is unblocked.",
             responses = {
                     @ApiResponse(responseCode = "200", description = "The complaint status is updated"),
                     @ApiResponse(responseCode = "400", description = "Complaint not found"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized user")
             })
-    @PatchMapping("/admin/update-status/{publicationId}")
-    public ResponseEntity<Void> updateStatus(@PathVariable String publicationId) throws PomboException {
+    @PatchMapping("/admin/update-status/{publicationId}/{newStatusString}")
+    public ResponseEntity<Void> updateStatus(@PathVariable String publicationId, @PathVariable String newStatusString) throws PomboException {
         User subject = authService.getAuthenticatedUser();
+        ComplaintStatus newStatus = null;
+
+        if(newStatusString.equalsIgnoreCase("accepted")){
+            newStatus = ComplaintStatus.ACCEPTED;
+        } else if (newStatusString.equalsIgnoreCase("rejected")){
+            newStatus = ComplaintStatus.REJECTED;
+        } else if (newStatusString.equalsIgnoreCase("pending")){
+            newStatus = ComplaintStatus.PENDING;
+        }
 
         if (subject.getRole() == Role.ADMIN) {
-            complaintService.updateStatus(publicationId);
+            complaintService.updateStatus(publicationId, newStatus);
             return ResponseEntity.ok().build();
         } else {
             throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);

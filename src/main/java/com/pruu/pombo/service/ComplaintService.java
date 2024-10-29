@@ -3,13 +3,11 @@ package com.pruu.pombo.service;
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.dto.ComplaintDTO;
 import com.pruu.pombo.model.entity.Complaint;
+import com.pruu.pombo.model.entity.Publication;
 import com.pruu.pombo.model.enums.ComplaintStatus;
 import com.pruu.pombo.model.enums.Reason;
-import com.pruu.pombo.model.enums.Role;
-import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.ComplaintRepository;
 import com.pruu.pombo.model.repository.PublicationRepository;
-import com.pruu.pombo.model.repository.UserRepository;
 import com.pruu.pombo.model.selector.ComplaintSelector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -60,34 +58,49 @@ public class ComplaintService {
         return complaintRepository.findAll(selector, Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
-    public void updateStatus(String complaintId) throws PomboException {
+    public void updateStatus(String complaintId, ComplaintStatus newStatus) throws PomboException {
         Complaint complaint = this.complaintRepository.findById(complaintId).orElseThrow(() -> new PomboException("Denúncia não encontrada.", HttpStatus.BAD_REQUEST));
+        Publication publication = complaint.getPublication();
 
-        if(complaint.getStatus() == ComplaintStatus.PENDING) {
-            complaint.setStatus(ComplaintStatus.ANALYSED);
-        } else {
-            complaint.setStatus(ComplaintStatus.PENDING);
+        if(!EnumSet.allOf(ComplaintStatus.class).contains(newStatus)) {
+            throw new PomboException("Status inválido", HttpStatus.BAD_REQUEST);
         }
 
-        this.complaintRepository.save(complaint);
+        if(newStatus == ComplaintStatus.ACCEPTED) {
+            publication.setBlocked(true);
+
+            publicationRepository.save(publication);
+        }
+        if(complaint.getStatus() == ComplaintStatus.ACCEPTED && (newStatus == ComplaintStatus.REJECTED || newStatus == ComplaintStatus.PENDING)) {
+            publication.setBlocked(false);
+
+            publicationRepository.save(publication);
+        }
+
+        complaint.setStatus(newStatus);
+        complaintRepository.save(complaint);
     }
 
     public ComplaintDTO findDTOByPublicationId(String publicationId) {
         List<Complaint> complaints = this.complaintRepository.findByPublicationId(publicationId);
         int pendingComplaintAmount = 0;
-        int analysedComplaintAmount = 0;
+        int acceptedComplaintAmount = 0;
+        int rejectedComplaintAmount = 0;
 
 
         for(Complaint c : complaints) {
             if(c.getStatus() == ComplaintStatus.PENDING) {
                 pendingComplaintAmount++;
             }
-            if(c.getStatus() == ComplaintStatus.ANALYSED) {
-                analysedComplaintAmount++;
+            if(c.getStatus() == ComplaintStatus.ACCEPTED) {
+                acceptedComplaintAmount++;
+            }
+            if(c.getStatus() == ComplaintStatus.REJECTED) {
+                rejectedComplaintAmount++;
             }
         }
 
-        ComplaintDTO dto = Complaint.toDTO(publicationId, complaints.size(), pendingComplaintAmount, analysedComplaintAmount);
+        ComplaintDTO dto = Complaint.toDTO(publicationId, complaints.size(), pendingComplaintAmount, acceptedComplaintAmount, rejectedComplaintAmount);
         return dto;
     }
 }

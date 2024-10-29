@@ -76,25 +76,6 @@ public class PublicationController {
         }
     }
 
-    @Operation(summary = "Blocks/Unblocks a publication (ADMIN ONLY)",
-            description = "Blocks/Unblocks a publication, the admin id and the publication id must be informed through the request params",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "The publication has been successfully blocked or unblocked"),
-                    @ApiResponse(responseCode = "400", description = "User or publication not found"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized user")
-            })
-    @PatchMapping("/admin/block/{publicationId}")
-    public ResponseEntity<Void> block(@PathVariable String publicationId) throws PomboException {
-        User subject = authService.getAuthenticatedUser();
-
-        if (subject.getRole() == Role.ADMIN) {
-            publicationService.block(publicationId);
-            return ResponseEntity.ok().build();
-        } else {
-            throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
-        }
-    }
-
     @Operation(summary = "Fetches all publications",
             description = "Fetches all publications",
             responses = {

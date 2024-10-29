@@ -9,5 +9,6 @@ public class ComplaintDTO {
     private String publicationId;
     private Integer complaintAmount;
     private Integer pendingComplaintAmount;
-    private Integer analysedComplaintAmount;
+    private Integer acceptedComplaintAmount;
+    private Integer rejectedComplaintAmount;
 }

@@ -61,21 +61,6 @@ public class PublicationService {
         publicationRepository.save(publication);
     }
 
-    // if the publication is already blocked, the method will unblock it
-    public void block(String publicationId) throws PomboException{
-        List<Complaint> complaints = this.complaintRepository.findByPublicationId(publicationId);
-
-        Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
-
-        if(complaints.isEmpty()) {
-            throw new PomboException("A publicação não foi denunciada", HttpStatus.BAD_REQUEST);
-        }
-
-        publication.setBlocked(!publication.isBlocked());
-
-        publicationRepository.save(publication);
-    }
-
     public List<Publication> fetchWithFilter(PublicationSelector selector) {
         if(selector.hasPagination()) {
             int pageNumber = selector.getPage();

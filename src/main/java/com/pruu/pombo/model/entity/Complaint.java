@@ -39,12 +39,13 @@ public class Complaint {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public static ComplaintDTO toDTO(String publicationId, Integer complaintAmount, Integer pendingComplaintAmount, Integer analysedComplaintAmount) {
+    public static ComplaintDTO toDTO(String publicationId, Integer complaintAmount, Integer pendingComplaintAmount, Integer acceptedComplaintAmount, Integer rejectedComplaintAmount) {
         return new ComplaintDTO(
                 publicationId,
                 complaintAmount,
                 pendingComplaintAmount,
-                analysedComplaintAmount
+                acceptedComplaintAmount,
+                rejectedComplaintAmount
         );
     }
 }
