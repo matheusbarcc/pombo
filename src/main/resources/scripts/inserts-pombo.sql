@@ -1,24 +1,24 @@
 USE pombodb;
 
--- password = pass1
+-- password = user1
 INSERT INTO `user` (`id`, `cpf`, `created_at`, `email`, `password`, `name`, `role`)
-VALUES ('ed8f56a4-12cd-44b5-8f99-4b1d8761d3b9', '12345678901', NOW(), 'john.doe@example.com', '$2a$12$3uhbH4AtQC.LWJo8EnKS5.ivlWS/jiSElamaT4R6Q24Snjlldqo96', 'John Doe', 'USER');
+VALUES ('ed8f56a4-12cd-44b5-8f99-4b1d8761d3b9', '48750168088', NOW(), 'user1@user.com', 'UmpjuuqncD2ACZaUvj3NyPTHmEk+H9Np37ql/G8ICQDxzT4wks2DKwtrlbzUVsg+9RJFE6RoRUTU3lRB50tPbMKX4g1sqkHt3ir5DIWgArIUb3wRHJkI+0ygYid5IraJU1D9XLQwh4gN7OTqpZSKKS6H90mjFqI+CG13IUAx0jN43hxsAaBX3N1X7u77eVUE+xvQMQrgNg20iHAMAg33Cbo4g0qu/2Pl/ZaLpgJ5MGWhwfAl97gHB4jeArc6OIbDB6+WCfhxzTKbd110JgI+vBHtVJakvgfzMy73TccCc0P10X3D9xH7RpY0UlW/aYLcG5RzuSlcsJ3UNtORw74Y/g==', 'John Doe', 'USER');
 
--- password = pass2
+-- password = user2
+INSERT INTO `user` (`id`, `cpf`, `created_at`, `email`,`password`, `name`, `role`)
+VALUES ('1fbb4516-b8b9-4d5a-929b-761a2c32e981', '82416611003', NOW(), 'user2@user.com', 'EdZml1IXoX3LTJ22772oWiD7HJAVXDOkKAYfILYBJyb4X5erUvuSfBp3dlvHrznAzeOWCSWaUtahK34wg1UbERNMdmAFvaEYHYTovR1iDZdr06XptqIzjD6zIMUkOzGAuOZcYHDuNrJ4ANY9n82uV0JIMS9OnS3WOidmAkahhSKe/WtBefNzfG2exBvI2VmbiUm/WQZKD28SZJojqdLkO5dTqFXoe9G7wn6hEExvx2i8Rb3v5yr58Mu/4lOXhpF4SC1OLTYdQepFUEt2t1yHJ71TV4/Ce0+ljPn1nqsHvwi02Psi34TPKQrKFUiEWXmBIkFegWUqBg7nUbq3V7IZ0w==', 'Robert Jones', 'USER');
+
+-- password = user3
+INSERT INTO `user` (`id`, `cpf`, `created_at`, `email`,`password`, `name`, `role`)
+VALUES ('d1e4edaf-bc63-4d49-822d-d58ec6d8d05a', '87024830093', NOW(), 'user3@user.com', 'W6tMPG827P2hFcD1kZy05V3Lhgl8CVcR+th6iHPXsTlk1lPO4BCwUtIwWe8PQd64n/YMBxis0RfNycOxCpT/4zD/ns8kP6xlLvMUy5u2DiPn/SjQA9Uw6KWWmEDcwiQ8vSao4WPO0K1EKbZ6vEWfek2v9KRNW2t1zIdfGJR/9clEvus3SdfS9Qih3yXb/ZVF8vCGiOBb04IRj++JvVRzLfr+wd6Bf+wFZpFbELNEYLWMj1VyGGtCBH+l1cuNBbGDjbdgvWLyOFviuSKUpVMXuWuu4amF2TX/ro4L5/KaCUkV64NAFeO53BwMzu22oRImxyoqpB+Chri36GEcFUqPcA==', 'Lisa White', 'USER');
+
+-- password = admin1
 INSERT INTO `user` (`id`, `cpf`, `created_at`, `email`, `password`, `name`, `role`)
-VALUES ('9b24b252-80ba-4e13-bafa-47a970b9e7cd', '23456789012', NOW(), 'jane.smith@example.com', '$2a$12$PqkSVkQKdGyrxCaxCllvMOwjdPFfpnWEvphfIYq/9ASOpJYNu6KZ2', 'Jane Smith', 'ADMIN');
+VALUES ('9b24b252-80ba-4e13-bafa-47a970b9e7cd', '94448025071', NOW(), 'admin1@admin.com', 'DtGin71xWG+npZrTLmVgF3poWtT3S7Nf8wLNFxnvlQsVGAdY7Sfm3IQ51eHj7iohQVdz/k1Ydt/RvtxOXbnhFl7t4ZMocBaTiARUpT9OG43EdyUY/Zc9Gkuic2Keqfii88f9FtFbrSYSIdYQTkHn6F5yG7pdVN1osVzUattrYbHPdpesgN4cKYHD1obH+Szew1LYs10pFsQsMsOYwXx1Llv0j/JS4QgQa/ObpGwTNwkLUvwwM08vvN7CTrPLRCeoZnfbJQm5pysuPj0zsCFxQ826Ku8kEif4BatngrED7V8RvbuXvnMMRHIJZ9yERPemXW5hGrY4YrA0Wu1nUvH2mw==', 'John Admin', 'ADMIN');
 
--- password = pass3
+-- password = admin2
 INSERT INTO `user` (`id`, `cpf`, `created_at`, `email`,`password`, `name`, `role`)
-VALUES ('1fbb4516-b8b9-4d5a-929b-761a2c32e981', '34567890123', NOW(), 'robert.jones@example.com', '$2a$12$MVSgVGNPnBo7vtb8exM8Buctlr4kBrliXpJYNy4eMMEiF7Vh13WDq', 'Robert Jones', 'USER');
-
--- password = pass4
-INSERT INTO `user` (`id`, `cpf`, `created_at`, `email`,`password`, `name`, `role`)
-VALUES ('d1e4edaf-bc63-4d49-822d-d58ec6d8d05a', '45678901234', NOW(), 'lisa.white@example.com', '$2a$12$kU5ftwFejuUaiWJCDWYs0O0ILJbOGOkYtgmp0j2uDjCteKhwwTYwy', 'Lisa White', 'USER');
-
--- password = pass5
-INSERT INTO `user` (`id`, `cpf`, `created_at`, `email`,`password`, `name`, `role`)
-VALUES ('7f67d21e-2e4f-4b6d-a0cc-54b3036c8f45', '56789012345', NOW(), 'michael.brown@example.com', '$2a$12$hiYDBvtIuWoxfrYI6635ZeV9F.tOfflKzawFg8w89988F/nFhonG6', 'Michael Brown', 'ADMIN');
+VALUES ('7f67d21e-2e4f-4b6d-a0cc-54b3036c8f45', '09394763040', NOW(), 'admin2@admin.com', 'SEjwsj+zrX7vLlcVzDdbihFn26wKtqWkmr7YfXT+AgnvjJ1RMlIuwDANwiE0hTclgff0JSFIJqq7BM9cG0iphmfCal90DqgvgbZqBuBwiLZZaI2jEThpsBzzd5WmcNikVogsyajS1AfahH3eT8vLxA3/PignHHbVr8KewFTkCLt/p6DCwrVOKk7AuRVtooNTV2ixrrA3UqoLgRN8fIL7J2PodqOo//CGQ6wK8nZhgGIUOh4psDNDzodTFQ9lXFfjM626AaIG/BYwlBXJuzwKCnZ2viwqtGwBGKZymjXUway6yE4yOOGbB26aE8qM7HyeipfktiAZ0HL4r3YR/udeJg==', 'Jane Admin', 'ADMIN');
 
 INSERT INTO `publication` (`id`, `blocked`, `content`, `created_at`, `user_id`)
 VALUES ('ffb0c3d7-0e44-4c8b-87b6-9580e6b63fa4', b'0', 'First publication content', NOW(), 'ed8f56a4-12cd-44b5-8f99-4b1d8761d3b9');

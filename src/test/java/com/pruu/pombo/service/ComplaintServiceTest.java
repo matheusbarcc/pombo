@@ -65,6 +65,8 @@ class ComplaintServiceTest {
 
         publication = PublicationFactory.createPublication(user);
         publication.setId("publication-01");
+
+        when(publicationRepository.findById("publication-01")).thenReturn(Optional.of(publication));
     }
 
     @AfterEach
@@ -87,18 +89,6 @@ class ComplaintServiceTest {
         assertThat(result).isNotNull();
         assertThat(result.getUser().getId()).isEqualTo("user-01");
         assertThat(result.getReason()).isEqualTo(Reason.SCAM);
-    }
-
-
-    @Test
-    @DisplayName("Should not be able to create a complaint with invalid user")
-    public void testCreate$invalidUser() {
-        User user2 = UserFactory.createUser();
-
-        Complaint complaint = ComplaintFactory.createComplaint(user2, publication);
-
-        assertThatThrownBy(() -> complaintService.create(complaint)).isInstanceOf(PomboException.class)
-                .hasMessageContaining("Usuário inválido");
     }
 
     @Test
@@ -126,25 +116,13 @@ class ComplaintServiceTest {
         complaint.setId("complaint-01");
 
         when(complaintRepository.findById("complaint-01")).thenReturn(Optional.of(complaint));
-        complaintService.updateStatus("admin-01", "complaint-01");
+        complaintService.updateStatus("complaint-01");
 
         assertThat(complaint.getStatus()).isEqualTo(ComplaintStatus.ANALYSED);
 
-        complaintService.updateStatus("admin-01", "complaint-01");
+        complaintService.updateStatus("complaint-01");
 
         assertThat(complaint.getStatus()).isEqualTo(ComplaintStatus.PENDING);
-    }
-
-    @Test
-    @DisplayName("Should not be able to update status without a admin role")
-    public void testUpdateStatus$withoutAdminRole() {
-        Complaint complaint = ComplaintFactory.createComplaint(user, publication);
-        complaint.setId("complaint-01");
-
-        when(complaintRepository.findById("complaint-01")).thenReturn(Optional.of(complaint));
-
-        assertThatThrownBy(() -> complaintService.updateStatus("user-01", "complaint-01"))
-                .isInstanceOf(PomboException.class).hasMessageContaining("Usuário não autorizado");
     }
 
     // DTO TESTS
@@ -163,7 +141,7 @@ class ComplaintServiceTest {
         complaints.add(complaint2);
 
         when(complaintRepository.findByPublicationId("publication-01")).thenReturn(complaints);
-        ComplaintDTO result = complaintService.findDTOByPublicationId("admin-01", "publication-01");
+        ComplaintDTO result = complaintService.findDTOByPublicationId("publication-01");
 
         assertThat(result).isNotNull();
         assertThat(result.getComplaintAmount()).isEqualTo(2);

@@ -8,6 +8,7 @@ import com.pruu.pombo.model.enums.Reason;
 import com.pruu.pombo.model.enums.Role;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.ComplaintRepository;
+import com.pruu.pombo.model.repository.PublicationRepository;
 import com.pruu.pombo.model.repository.UserRepository;
 import com.pruu.pombo.model.selector.ComplaintSelector;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -27,10 +27,12 @@ public class ComplaintService {
     private ComplaintRepository complaintRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private PublicationRepository publicationRepository;
 
     public Complaint create(Complaint complaint) throws PomboException {
-        userRepository.findById(complaint.getUser().getId()).orElseThrow(() -> new PomboException("Usuário inválido.", HttpStatus.BAD_REQUEST));
+        publicationRepository.findById(complaint.getPublication().getId()).orElseThrow(() -> new PomboException(
+                "Publicação não encontrada.", HttpStatus.BAD_REQUEST));
+
         if(complaint.getReason() == null || !EnumSet.allOf(Reason.class).contains(complaint.getReason())) {
             throw new PomboException("Motivo inválido", HttpStatus.BAD_REQUEST);
         }
@@ -38,18 +40,15 @@ public class ComplaintService {
         return complaintRepository.save(complaint);
     }
 
-    public List<Complaint> findAll(String userId) throws PomboException {
-        verifyAdmin(userId);
+    public List<Complaint> fetchAll(){
         return complaintRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
-    public Complaint findById(String complaintId, String userId) throws PomboException {
-        verifyAdmin(userId);
+    public Complaint findById(String complaintId) throws PomboException {
         return complaintRepository.findById(complaintId).orElseThrow(() -> new PomboException("Denúncia não encontrada.", HttpStatus.BAD_REQUEST));
     }
 
-    public List<Complaint> fetchWithFilter(ComplaintSelector selector, String userId) throws PomboException {
-        verifyAdmin(userId);
+    public List<Complaint> fetchWithFilter(ComplaintSelector selector) {
         if(selector.hasPagination()) {
             int pageNumber = selector.getPage();
             int pageSize = selector.getLimit();
@@ -61,8 +60,7 @@ public class ComplaintService {
         return complaintRepository.findAll(selector, Sort.by(Sort.Direction.DESC, "createdAt"));
     }
 
-    public void updateStatus(String adminId, String complaintId) throws PomboException {
-        verifyAdmin(adminId);
+    public void updateStatus(String complaintId) throws PomboException {
         Complaint complaint = this.complaintRepository.findById(complaintId).orElseThrow(() -> new PomboException("Denúncia não encontrada.", HttpStatus.BAD_REQUEST));
 
         if(complaint.getStatus() == ComplaintStatus.PENDING) {
@@ -74,8 +72,7 @@ public class ComplaintService {
         this.complaintRepository.save(complaint);
     }
 
-    public ComplaintDTO findDTOByPublicationId(String userId, String publicationId) throws PomboException {
-        verifyAdmin(userId);
+    public ComplaintDTO findDTOByPublicationId(String publicationId) {
         List<Complaint> complaints = this.complaintRepository.findByPublicationId(publicationId);
         int pendingComplaintAmount = 0;
         int analysedComplaintAmount = 0;
@@ -92,18 +89,5 @@ public class ComplaintService {
 
         ComplaintDTO dto = Complaint.toDTO(publicationId, complaints.size(), pendingComplaintAmount, analysedComplaintAmount);
         return dto;
-    }
-
-    public boolean delete(String id) {
-        complaintRepository.deleteById(id);
-        return true;
-    }
-
-    public void verifyAdmin(String userId) throws PomboException{
-        User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuário não encontrado.", HttpStatus.BAD_REQUEST));
-
-        if(user.getRole() == Role.USER) {
-            throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
-        }
     }
 }

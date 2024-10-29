@@ -7,10 +7,11 @@ import com.pruu.pombo.model.selector.ComplaintSelector;
 import com.pruu.pombo.service.ComplaintService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import jakarta.validation.Valid;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,16 +23,29 @@ public class ComplaintController {
     @Autowired
     private ComplaintService complaintService;
 
-    @Operation(summary = "Creates a new complaint",
+    @Operation(summary = "Creates a new complaint (USER ONLY)",
             description = "Creates a new complaint, the request must receive at least the user id that is making the complaint," +
                     " the publication id and the reason",
             responses = {
-                    @ApiResponse(responseCode = "200", description = "A new complaint has been successfully created"),
-                    // TODO - Treat error if publication or user is wrong or miss informed
+                    @ApiResponse(responseCode = "200", description = "A new complaint has been successfully created."),
+                    @ApiResponse(responseCode = "400", description = "The complaints publication doesnt exist."),
+                    @ApiResponse(responseCode = "401", description = "Administrators cant create complaints."),
             })
     @PostMapping
-    public Complaint create(@RequestBody Complaint complaint) throws PomboException {
-        return complaintService.create(complaint);
+    public Complaint create(@RequestBody Complaint complaint, Authentication auth) throws PomboException {
+        Jwt jwt = (Jwt) auth.getPrincipal();
+
+        String role = (String) jwt.getClaims().get("roles");
+
+        String userId = (String) jwt.getClaims().get("userId");
+
+        if (role.equalsIgnoreCase("user")) {
+            complaint.getUser().setId(userId);
+
+            return complaintService.create(complaint);
+        } else {
+            throw new PomboException("Administradores não podem fazer denúncias.", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @Operation(summary = "Fetches complaints with filters (ADMIN ONLY)",
@@ -42,9 +56,17 @@ public class ComplaintController {
                     @ApiResponse(responseCode = "400", description = "Wrong or forgotten information on the body"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized user")
             })
-    @PostMapping("/filter")
-    public List<Complaint> fetchWithFilter(@RequestBody ComplaintSelector selector, @RequestParam String adminId) throws PomboException {
-        return complaintService.fetchWithFilter(selector, adminId);
+    @PostMapping("/admin/filter")
+    public List<Complaint> fetchWithFilter(@RequestBody ComplaintSelector selector, Authentication auth) throws PomboException {
+        Jwt jwt = (Jwt) auth.getPrincipal();
+
+        String role = (String) jwt.getClaims().get("roles");
+
+        if (role.equalsIgnoreCase("admin")) {
+            return complaintService.fetchWithFilter(selector);
+        } else {
+            throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @Operation(summary = "Fetches all complaints (ADMIN ONLY)",
@@ -53,9 +75,17 @@ public class ComplaintController {
                     @ApiResponse(responseCode = "200", description = "A list of all complaints is returned."),
                     @ApiResponse(responseCode = "401", description = "Unauthorized user")
             })
-    @GetMapping
-    public List<Complaint> findAll(@RequestParam String adminId) throws PomboException {
-        return complaintService.findAll(adminId);
+    @GetMapping("/admin/all")
+    public List<Complaint> fetchAll(Authentication auth) throws PomboException {
+        Jwt jwt = (Jwt) auth.getPrincipal();
+
+        String role = (String) jwt.getClaims().get("roles");
+
+        if (role.equalsIgnoreCase("admin")) {
+            return complaintService.fetchAll();
+        } else {
+            throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @Operation(summary = "Finds a specific complaint (ADMIN ONLY)",
@@ -65,9 +95,17 @@ public class ComplaintController {
                     @ApiResponse(responseCode = "400", description = "Complaint not found"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized user")
             })
-    @GetMapping("/{id}")
-    public Complaint findById(@PathVariable String id, @RequestParam String adminId) throws PomboException {
-        return complaintService.findById(id, adminId);
+    @GetMapping("/admin/{id}")
+    public Complaint findById(@PathVariable String id, Authentication auth) throws PomboException {
+        Jwt jwt = (Jwt) auth.getPrincipal();
+
+        String role = (String) jwt.getClaims().get("roles");
+
+        if (role.equalsIgnoreCase("admin")) {
+            return complaintService.findById(id);
+        } else {
+            throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @Operation(summary = "Fetches a report from a specific complaint through a DTO (ADMIN ONLY)",
@@ -78,9 +116,17 @@ public class ComplaintController {
                     @ApiResponse(responseCode = "400", description = "Complaint not found"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized user")
             })
-    @GetMapping("/dto")
-    public ComplaintDTO findDTOByPublicationId(@RequestParam String adminId, @RequestParam String publicationId) throws PomboException {
-        return complaintService.findDTOByPublicationId(adminId, publicationId);
+    @GetMapping("/admin/dto/{id}")
+    public ComplaintDTO findDTOByPublicationId(Authentication auth, @PathVariable String id) throws PomboException {
+        Jwt jwt = (Jwt) auth.getPrincipal();
+
+        String role = (String) jwt.getClaims().get("roles");
+
+        if (role.equalsIgnoreCase("admin")) {
+            return complaintService.findDTOByPublicationId(id);
+        } else {
+            throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     @Operation(summary = "Change the status from a specific complaint (ADMIN ONLY)",
@@ -90,24 +136,17 @@ public class ComplaintController {
                     @ApiResponse(responseCode = "400", description = "Complaint not found"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized user")
             })
-    @PatchMapping("/update-status")
-    public ResponseEntity<Void> updateStatus(@RequestParam String adminId, @RequestParam String complaintId) throws PomboException {
-        complaintService.updateStatus(adminId, complaintId);
-        return ResponseEntity.ok().build();
+    @PatchMapping("/admin/update-status/{id}")
+    public ResponseEntity<Void> updateStatus(Authentication auth, @PathVariable String id) throws PomboException {
+        Jwt jwt = (Jwt) auth.getPrincipal();
+
+        String role = (String) jwt.getClaims().get("roles");
+
+        if (role.equalsIgnoreCase("admin")) {
+            complaintService.updateStatus(id);
+            return ResponseEntity.ok().build();
+        } else {
+            throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
+        }
     }
-
-//    @Operation(summary = "Deletes a complaint",
-//            description = "Deletes a complaint, the complaint id and the user id must be informed in the request params," +
-//                    " only the user who created the complaint has the permission to delete it",
-//            responses = {
-//                    @ApiResponse(responseCode = "200", description = "The complaint has been successfully deleted"),
-//                    @ApiResponse(responseCode = "400", description = "Complaint not found"),
-//                    @ApiResponse(responseCode = "401", description = "Unauthorized user")
-//            })
-////    @DeleteMapping("/{id}")
-////    public boolean deleteById(@PathVariable String id) {
-////        // TODO validate permission
-////        return complaintService.delete(id);
-////    }
-
 }
