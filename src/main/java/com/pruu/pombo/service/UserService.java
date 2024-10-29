@@ -40,6 +40,11 @@ public class UserService implements UserDetailsService {
     public User update(User user) throws PomboException {
         this.standardizeCpf(user);
         this.verifyIfUserExists(user);
+        User userOnDatabase = this.userRepository.findById(user.getId()).orElseThrow(() -> new PomboException("Usuário não encontrado.", HttpStatus.BAD_REQUEST));
+
+        user.setPassword(userOnDatabase.getPassword());
+        user.setCreatedAt(userOnDatabase.getCreatedAt());
+        user.setRole(userOnDatabase.getRole());
 
         return userRepository.save(user);
     }
@@ -54,11 +59,6 @@ public class UserService implements UserDetailsService {
         }
 
         return userRepository.findAll(selector);
-    }
-
-    public boolean delete(String id) {
-        userRepository.deleteById(id);
-        return true;
     }
 
     public void standardizeCpf(User user) {

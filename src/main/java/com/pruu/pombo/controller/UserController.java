@@ -1,5 +1,6 @@
 package com.pruu.pombo.controller;
 
+import com.pruu.pombo.auth.AuthService;
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.selector.UserSelector;
@@ -19,6 +20,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AuthService authService;
 
     @Operation(summary = "Fetches users with filters",
             description = "Fetches a group of users based on a filter passed through the body, pagination also included",
@@ -40,6 +44,10 @@ public class UserController {
             })
     @PutMapping
     public User update(@Valid @RequestBody User user) throws PomboException {
+        User subject = authService.getAuthenticatedUser();
+
+        user.setId(subject.getId());
+
         return userService.update(user);
     }
 
@@ -49,13 +57,7 @@ public class UserController {
                     @ApiResponse(responseCode = "200", description = "The user information is returned"),
             })
     @GetMapping("/{id}")
-    public ResponseEntity<User> findById(@PathVariable String id) {
-        return ResponseEntity.ok(userService.findById(id));
+    public User findById(@PathVariable String id) {
+        return userService.findById(id);
     }
-
-//    @DeleteMapping("/{id}")
-//    public boolean deleteById(@PathVariable String id) {
-//        // TODO validate permission
-//        return userService.delete(id);
-//    }
 }

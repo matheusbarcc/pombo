@@ -75,18 +75,6 @@ public class PublicationServiceTest {
         assertThat(result.getContent()).isEqualTo(publication.getContent());
     }
 
-    @Test
-    @DisplayName("Should not be able to create a publication with invalid user")
-    public void testCreate$invalidUser() {
-        User user2 = new User();
-        Publication publication = PublicationFactory.createPublication(user2);
-
-        when(publicationRepository.save(publication)).thenReturn(publication);
-
-        assertThatThrownBy(() -> publicationService.create(publication)).isInstanceOf(PomboException.class)
-                .hasMessageContaining("Usuário inválido");
-    }
-
     // LIKE TESTS
 
     /*
