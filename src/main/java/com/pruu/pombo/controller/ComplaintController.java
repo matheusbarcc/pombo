@@ -1,8 +1,11 @@
 package com.pruu.pombo.controller;
 
+import com.pruu.pombo.auth.AuthService;
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.dto.ComplaintDTO;
 import com.pruu.pombo.model.entity.Complaint;
+import com.pruu.pombo.model.entity.User;
+import com.pruu.pombo.model.enums.Role;
 import com.pruu.pombo.model.selector.ComplaintSelector;
 import com.pruu.pombo.service.ComplaintService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,6 +26,9 @@ public class ComplaintController {
     @Autowired
     private ComplaintService complaintService;
 
+    @Autowired
+    private AuthService authService;
+
     @Operation(summary = "Creates a new complaint (USER ONLY)",
             description = "Creates a new complaint, the request must receive at least the user id that is making the complaint," +
                     " the publication id and the reason",
@@ -32,15 +38,11 @@ public class ComplaintController {
                     @ApiResponse(responseCode = "401", description = "Administrators cant create complaints."),
             })
     @PostMapping
-    public Complaint create(@RequestBody Complaint complaint, Authentication auth) throws PomboException {
-        Jwt jwt = (Jwt) auth.getPrincipal();
+    public Complaint create(@RequestBody Complaint complaint) throws PomboException {
+        User subject = authService.getAuthenticatedUser();
 
-        String role = (String) jwt.getClaims().get("roles");
-
-        String userId = (String) jwt.getClaims().get("userId");
-
-        if (role.equalsIgnoreCase("user")) {
-            complaint.getUser().setId(userId);
+        if (subject.getRole() == Role.USER) {
+            complaint.getUser().setId(subject.getId());
 
             return complaintService.create(complaint);
         } else {
@@ -57,12 +59,10 @@ public class ComplaintController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized user")
             })
     @PostMapping("/admin/filter")
-    public List<Complaint> fetchWithFilter(@RequestBody ComplaintSelector selector, Authentication auth) throws PomboException {
-        Jwt jwt = (Jwt) auth.getPrincipal();
+    public List<Complaint> fetchWithFilter(@RequestBody ComplaintSelector selector) throws PomboException {
+        User subject = authService.getAuthenticatedUser();
 
-        String role = (String) jwt.getClaims().get("roles");
-
-        if (role.equalsIgnoreCase("admin")) {
+        if (subject.getRole() == Role.ADMIN) {
             return complaintService.fetchWithFilter(selector);
         } else {
             throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
@@ -76,12 +76,10 @@ public class ComplaintController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized user")
             })
     @GetMapping("/admin/all")
-    public List<Complaint> fetchAll(Authentication auth) throws PomboException {
-        Jwt jwt = (Jwt) auth.getPrincipal();
+    public List<Complaint> fetchAll() throws PomboException {
+        User subject = authService.getAuthenticatedUser();
 
-        String role = (String) jwt.getClaims().get("roles");
-
-        if (role.equalsIgnoreCase("admin")) {
+        if (subject.getRole() == Role.ADMIN) {
             return complaintService.fetchAll();
         } else {
             throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
@@ -96,12 +94,10 @@ public class ComplaintController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized user")
             })
     @GetMapping("/admin/{id}")
-    public Complaint findById(@PathVariable String id, Authentication auth) throws PomboException {
-        Jwt jwt = (Jwt) auth.getPrincipal();
+    public Complaint findById(@PathVariable String id) throws PomboException {
+        User subject = authService.getAuthenticatedUser();
 
-        String role = (String) jwt.getClaims().get("roles");
-
-        if (role.equalsIgnoreCase("admin")) {
+        if (subject.getRole() == Role.ADMIN) {
             return complaintService.findById(id);
         } else {
             throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
@@ -117,12 +113,10 @@ public class ComplaintController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized user")
             })
     @GetMapping("/admin/dto/{id}")
-    public ComplaintDTO findDTOByPublicationId(Authentication auth, @PathVariable String id) throws PomboException {
-        Jwt jwt = (Jwt) auth.getPrincipal();
+    public ComplaintDTO findDTOByPublicationId(@PathVariable String id) throws PomboException {
+        User subject = authService.getAuthenticatedUser();
 
-        String role = (String) jwt.getClaims().get("roles");
-
-        if (role.equalsIgnoreCase("admin")) {
+        if (subject.getRole() == Role.ADMIN) {
             return complaintService.findDTOByPublicationId(id);
         } else {
             throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
@@ -136,14 +130,12 @@ public class ComplaintController {
                     @ApiResponse(responseCode = "400", description = "Complaint not found"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized user")
             })
-    @PatchMapping("/admin/update-status/{id}")
-    public ResponseEntity<Void> updateStatus(Authentication auth, @PathVariable String id) throws PomboException {
-        Jwt jwt = (Jwt) auth.getPrincipal();
+    @PatchMapping("/admin/update-status/{publicationId}")
+    public ResponseEntity<Void> updateStatus(@PathVariable String publicationId) throws PomboException {
+        User subject = authService.getAuthenticatedUser();
 
-        String role = (String) jwt.getClaims().get("roles");
-
-        if (role.equalsIgnoreCase("admin")) {
-            complaintService.updateStatus(id);
+        if (subject.getRole() == Role.ADMIN) {
+            complaintService.updateStatus(publicationId);
             return ResponseEntity.ok().build();
         } else {
             throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);

@@ -174,11 +174,11 @@ public class PublicationServiceTest {
             the creator of the publication blocking their own publication,
             doesnt make sense but it will validate the blocking feature anyway
         */
-        publicationService.block("admin-01", "publication-01");
+        publicationService.block("publication-01");
 
         assertThat(publication.isBlocked()).isTrue();
 
-        publicationService.block("admin-01", "publication-01");
+        publicationService.block("publication-01");
 
         assertThat(publication.isBlocked()).isFalse();
     }
@@ -207,25 +207,6 @@ public class PublicationServiceTest {
     }
 
     @Test
-    @DisplayName("Should not be able to block a publication without a admin role")
-    public void testBlockUnblock$withoutAdminRole(){
-        Publication publication = PublicationFactory.createPublication(user);
-        publication.setId("publication-01");
-
-        Complaint complaint = ComplaintFactory.createComplaint(user, publication);
-        List<Complaint> complaints = new ArrayList<>();
-        complaints.add(complaint);
-
-        when(publicationRepository.findById("publication-01")).thenReturn(Optional.of(publication));
-        when(complaintRepository.findByPublicationId("publication-01")).thenReturn(complaints);
-        when(publicationRepository.save(publication)).thenReturn(publication);
-
-        assertThatThrownBy(() -> publicationService.block("user-01", "publication-01"))
-                .isInstanceOf(PomboException.class).hasMessageContaining("Usuário não autorizado");
-
-    }
-
-    @Test
     @DisplayName("Should not be able to block a publication without at least one complaint")
     public void testBlockUnblock$withoutComplaint(){
         User admin = UserFactory.createUser();
@@ -239,7 +220,7 @@ public class PublicationServiceTest {
         when(publicationRepository.findById("publication-01")).thenReturn(Optional.of(publication));
         when(publicationRepository.save(publication)).thenReturn(publication);
 
-        assertThatThrownBy(() -> publicationService.block("admin-01", "publication-01"))
+        assertThatThrownBy(() -> publicationService.block("publication-01"))
                 .isInstanceOf(PomboException.class).hasMessageContaining("A publicação não foi denunciada");
     }
 

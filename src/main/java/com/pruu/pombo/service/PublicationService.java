@@ -32,8 +32,6 @@ public class PublicationService {
     private ComplaintRepository complaintRepository;
 
     public Publication create(Publication publication) throws PomboException {
-        this.userRepository.findById(publication.getUser().getId()).orElseThrow(() -> new PomboException("Usuário inválido.", HttpStatus.BAD_REQUEST));
-
         return publicationRepository.save(publication);
     }
 
@@ -64,9 +62,7 @@ public class PublicationService {
     }
 
     // if the publication is already blocked, the method will unblock it
-    public void block(String userId, String publicationId) throws PomboException{
-        verifyAdmin(userId);
-
+    public void block(String publicationId) throws PomboException{
         List<Complaint> complaints = this.complaintRepository.findByPublicationId(publicationId);
 
         Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
