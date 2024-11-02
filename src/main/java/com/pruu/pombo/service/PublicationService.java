@@ -1,5 +1,6 @@
 package com.pruu.pombo.service;
 
+import com.pruu.pombo.auth.RSAEncoder;
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.dto.PublicationDTO;
 import com.pruu.pombo.model.entity.Complaint;
@@ -29,9 +30,15 @@ public class PublicationService {
     private UserRepository userRepository;
 
     @Autowired
-    private ComplaintRepository complaintRepository;
+    private RSAEncoder rsaEncoder;
 
     public Publication create(Publication publication) throws PomboException {
+        if(publication.getContent().length() > 300) {
+            throw new PomboException("O conteúdo do Pruu deve conter no máximo 300 caracteres.", HttpStatus.BAD_REQUEST);
+        }
+
+        publication.setContent(rsaEncoder.encode(publication.getContent()));
+
         return publicationRepository.save(publication);
     }
 
@@ -40,7 +47,10 @@ public class PublicationService {
     }
 
     public Publication findById(String id) throws PomboException {
-        return publicationRepository.findById(id).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
+        Publication publication = publicationRepository.findById(id).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
+        publication.setContent(rsaEncoder.decode(publication.getContent()));
+
+        return publication;
     }
 
 
@@ -62,15 +72,24 @@ public class PublicationService {
     }
 
     public List<Publication> fetchWithFilter(PublicationSelector selector) {
+        List<Publication> publications;
+
         if(selector.hasPagination()) {
             int pageNumber = selector.getPage();
             int pageSize = selector.getLimit();
 
             PageRequest page = PageRequest.of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.DESC, "createdAt"));
-            return publicationRepository.findAll(selector, page).toList();
+            publications = new ArrayList<>(publicationRepository.findAll(selector, page).toList());
+
+        } else {
+            publications = new ArrayList<>(publicationRepository.findAll(selector, Sort.by(Sort.Direction.DESC, "createdAt")));
         }
 
-        return publicationRepository.findAll(selector, Sort.by(Sort.Direction.DESC, "createdAt"));
+        for(Publication p : publications) {
+            p.setContent(rsaEncoder.decode(p.getContent()));
+        }
+
+        return publications;
     }
 
     public List<User> fetchPublicationLikes(String publicationId) throws PomboException {
@@ -90,6 +109,7 @@ public class PublicationService {
         List<PublicationDTO> dtos = new ArrayList<>();
 
         for(Publication p : publications) {
+            p.setContent(rsaEncoder.decode(p.getContent()));
             Integer likeAmount = this.fetchPublicationLikes(p.getId()).size();
             Integer complaintAmount = this.fetchPublicationComplaints(p.getId()).size();
             PublicationDTO dto = Publication.toDTO(p, likeAmount, complaintAmount);
@@ -97,18 +117,5 @@ public class PublicationService {
         }
 
         return dtos;
-    }
-
-    public boolean delete(String id){
-        publicationRepository.deleteById(id);
-        return true;
-    }
-
-    public void verifyAdmin(String userId) throws PomboException{
-        User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuário não encontrado.", HttpStatus.BAD_REQUEST));
-
-        if(user.getRole() == Role.USER) {
-            throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
-        }
     }
 }

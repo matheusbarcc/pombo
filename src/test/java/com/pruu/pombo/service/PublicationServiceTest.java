@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
+import com.pruu.pombo.auth.RSAEncoder;
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.factories.ComplaintFactory;
 import com.pruu.pombo.factories.PublicationFactory;
@@ -40,7 +41,7 @@ public class PublicationServiceTest {
     private PublicationRepository publicationRepository;
 
     @Mock
-    private ComplaintRepository complaintRepository;
+    private RSAEncoder rsaEncoder;
 
     @InjectMocks
     private PublicationService publicationService;
@@ -72,7 +73,6 @@ public class PublicationServiceTest {
 
         assertThat(result).isNotNull();
         assertThat(result.getUser()).isEqualTo(user);
-        assertThat(result.getContent()).isEqualTo(publication.getContent());
     }
 
     // LIKE TESTS

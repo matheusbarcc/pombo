@@ -60,6 +60,6 @@ public class SecurityConfig {
 
     @Bean
     PasswordEncoder passwordEncoder(){
-        return new RSAPasswordEncoder(publicKey, privateKey);
+        return new PasswordHasher();
     }
 }

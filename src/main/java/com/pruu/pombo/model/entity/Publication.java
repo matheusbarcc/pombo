@@ -26,7 +26,7 @@ public class Publication {
     private User user;
 
     @NotBlank
-    @Size(max = 300, message = "O conteúdo do Pruu deve conter no máximo 300 caracteres.")
+    @Size(max = 350, message = "O conteúdo do Pruu deve conter no máximo 300 caracteres.")
     private String content;
 
     @ManyToMany

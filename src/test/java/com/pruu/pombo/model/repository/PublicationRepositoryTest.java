@@ -28,16 +28,18 @@ public class PublicationRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
-    @Test
-    @DisplayName("Should not be able to insert publication with content bigger than 300 characters")
-    public void testInsert$contentMoreThan300Characters() {
-        User user = UserFactory.createUser();
-        userRepository.save(user);
-        Publication publication = PublicationFactory.createPublication(user);
-        String content = "a";
-        publication.setContent(content.repeat(301));
+    // Commented test because the validation is now being done at service due to content encoding
 
-        assertThatThrownBy(() -> publicationRepository.saveAndFlush(publication)).isInstanceOf(ConstraintViolationException.class)
-                .hasMessageContaining("O conteúdo do Pruu deve conter no máximo 300 caracteres");
-    }
+//    @Test
+//    @DisplayName("Should not be able to insert publication with content bigger than 300 characters")
+//    public void testInsert$contentMoreThan300Characters() {
+//        User user = UserFactory.createUser();
+//        userRepository.save(user);
+//        Publication publication = PublicationFactory.createPublication(user);
+//        String content = "a";
+//        publication.setContent(content.repeat(301));
+//
+//        assertThatThrownBy(() -> publicationRepository.saveAndFlush(publication)).isInstanceOf(ConstraintViolationException.class)
+//                .hasMessageContaining("O conteúdo do Pruu deve conter no máximo 300 caracteres");
+//    }
 }
