@@ -1,13 +1,11 @@
 package com.pruu.pombo.service;
 
-import com.pruu.pombo.auth.RSAEncoder;
+import com.pruu.pombo.utils.RSAEncoder;
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.dto.PublicationDTO;
 import com.pruu.pombo.model.entity.Complaint;
 import com.pruu.pombo.model.entity.Publication;
-import com.pruu.pombo.model.enums.Role;
 import com.pruu.pombo.model.entity.User;
-import com.pruu.pombo.model.repository.ComplaintRepository;
 import com.pruu.pombo.model.repository.PublicationRepository;
 import com.pruu.pombo.model.repository.UserRepository;
 import com.pruu.pombo.model.selector.PublicationSelector;

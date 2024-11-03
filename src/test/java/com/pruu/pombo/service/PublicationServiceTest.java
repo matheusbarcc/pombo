@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
-import com.pruu.pombo.auth.RSAEncoder;
+import com.pruu.pombo.utils.RSAEncoder;
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.factories.ComplaintFactory;
 import com.pruu.pombo.factories.PublicationFactory;
@@ -13,8 +13,6 @@ import com.pruu.pombo.model.dto.PublicationDTO;
 import com.pruu.pombo.model.entity.Complaint;
 import com.pruu.pombo.model.entity.Publication;
 import com.pruu.pombo.model.entity.User;
-import com.pruu.pombo.model.enums.Role;
-import com.pruu.pombo.model.repository.ComplaintRepository;
 import com.pruu.pombo.model.repository.PublicationRepository;
 import com.pruu.pombo.model.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
