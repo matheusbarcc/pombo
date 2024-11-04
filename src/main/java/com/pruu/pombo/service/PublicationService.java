@@ -1,5 +1,7 @@
 package com.pruu.pombo.service;
 
+import com.pruu.pombo.model.entity.Attachment;
+import com.pruu.pombo.model.repository.AttachmentRepository;
 import com.pruu.pombo.utils.RSAEncoder;
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.dto.PublicationDTO;
@@ -28,6 +30,9 @@ public class PublicationService {
     private UserRepository userRepository;
 
     @Autowired
+    private AttachmentRepository attachmentRepositoy;
+
+    @Autowired
     private RSAEncoder rsaEncoder;
 
     public Publication create(Publication publication) throws PomboException {
@@ -37,7 +42,16 @@ public class PublicationService {
 
         publication.setContent(rsaEncoder.encode(publication.getContent()));
 
-        return publicationRepository.save(publication);
+        Publication result = publicationRepository.saveAndFlush(publication);
+
+        if(publication.getAttachment() != null) {
+            Attachment attachment = attachmentRepositoy.findById(publication.getAttachment().getId()).orElseThrow(() -> new PomboException("Anexo não encontrado.", HttpStatus.BAD_REQUEST));
+            attachment.setPublication(publication);
+
+            attachmentRepositoy.save(attachment);
+        }
+
+        return result;
     }
 
     public List<Publication> findAll() {
@@ -50,7 +64,6 @@ public class PublicationService {
 
         return publication;
     }
-
 
     // if the publication is already liked, the method will unlike it
     public void like(String userId, String publicationId) throws PomboException {
