@@ -16,7 +16,7 @@ public class R2StorageConfig {
     @Value("${cloudfare.account.id}")
     private String accountId;
 
-    @Value("${aws.access.key.id}")
+    @Value("${aws.access.key}")
     private String accessKey;
 
     @Value("${aws.secret.access.key}")
