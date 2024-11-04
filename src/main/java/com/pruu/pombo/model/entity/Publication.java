@@ -37,6 +37,9 @@ public class Publication {
     @JsonBackReference
     private List<Complaint> complaints;
 
+    @OneToOne(mappedBy = "publication")
+    private Attachment attachment;
+
     private boolean blocked = false;
 
     @CreationTimestamp

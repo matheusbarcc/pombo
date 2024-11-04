@@ -21,7 +21,6 @@ public class AttachmentController {
 
     @PostMapping("/upload")
     public String upload(@RequestParam("file") MultipartFile file) throws AmazonClientException, PomboException, IOException {
-        attachmentService.upload(file);
-        return "File was uploaded successfully";
+        return attachmentService.uploadAndCreateAttachment(file);
     }
 }

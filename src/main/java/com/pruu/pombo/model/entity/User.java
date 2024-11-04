@@ -57,6 +57,9 @@ public class User implements UserDetails {
     @JsonBackReference(value = "user-complaints")
     private List<Complaint> complaints;
 
+    @OneToOne(mappedBy = "user")
+    private Attachment attachment;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
