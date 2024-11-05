@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -54,7 +55,11 @@ public class AttachmentService {
 
     public String getAttachmentUrl(String attachmentId) throws PomboException {
         Attachment attachment = attachmentRepository.findById(attachmentId)
-                .orElseThrow(() -> new PomboException("Attachment not found", HttpStatus.NOT_FOUND));
+                .orElse(null);
+
+        if(attachment == null) {
+            return "";
+        }
 
         Date expiration = new Date(System.currentTimeMillis() + 3600 * 1000); // 1 hour
 

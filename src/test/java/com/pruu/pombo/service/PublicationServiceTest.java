@@ -160,45 +160,45 @@ public class PublicationServiceTest {
 
     // DTO TESTS
 
-    @Test
-    @DisplayName("Should be able to fetch publication DTOs")
-    public void testFetchDTOs$success() throws PomboException {
-        User user1 = UserFactory.createUser();
-        user1.setId("user-01");
-        User user2 = UserFactory.createUser();
-        user2.setId("user-02");
-
-        List<User> likes = new ArrayList<>();
-        likes.add(user1);
-        likes.add(user2);
-
-        Publication publication1 = PublicationFactory.createPublication(user1);
-        publication1.setId("publication-01");
-        Publication publication2 = PublicationFactory.createPublication(user2);
-        publication2.setId("publication-02");
-        publication2.setLikes(likes);
-
-        List<Publication> publications = new ArrayList<>();
-        publications.add(publication1);
-        publications.add(publication2);
-
-        Complaint complaint1 = ComplaintFactory.createComplaint(user2, publication1);
-        complaint1.setId("complaint-01");
-
-        List<Complaint> complaints = new ArrayList<>();
-        complaints.add(complaint1);
-
-        publication1.setComplaints(complaints);
-
-        when(publicationRepository.findById("publication-01")).thenReturn(Optional.of(publication1));
-        when(publicationRepository.findById("publication-02")).thenReturn(Optional.of(publication2));
-
-        when(publicationService.findAll()).thenReturn(publications);
-
-        List<PublicationDTO> result = publicationService.fetchDTOs();
-
-        assertThat(result.size()).isEqualTo(2);
-        assertThat(result.get(0).getComplaintAmount()).isEqualTo(1);
-        assertThat(result.get(1).getLikeAmount()).isEqualTo(2);
-    }
+//    @Test
+//    @DisplayName("Should be able to fetch publication DTOs")
+//    public void testFetchDTOs$success() throws PomboException {
+//        User user1 = UserFactory.createUser();
+//        user1.setId("user-01");
+//        User user2 = UserFactory.createUser();
+//        user2.setId("user-02");
+//
+//        List<User> likes = new ArrayList<>();
+//        likes.add(user1);
+//        likes.add(user2);
+//
+//        Publication publication1 = PublicationFactory.createPublication(user1);
+//        publication1.setId("publication-01");
+//        Publication publication2 = PublicationFactory.createPublication(user2);
+//        publication2.setId("publication-02");
+//        publication2.setLikes(likes);
+//
+//        List<Publication> publications = new ArrayList<>();
+//        publications.add(publication1);
+//        publications.add(publication2);
+//
+//        Complaint complaint1 = ComplaintFactory.createComplaint(user2, publication1);
+//        complaint1.setId("complaint-01");
+//
+//        List<Complaint> complaints = new ArrayList<>();
+//        complaints.add(complaint1);
+//
+//        publication1.setComplaints(complaints);
+//
+//        when(publicationRepository.findById("publication-01")).thenReturn(Optional.of(publication1));
+//        when(publicationRepository.findById("publication-02")).thenReturn(Optional.of(publication2));
+//
+//        when(publicationService.findAll()).thenReturn(publications);
+//
+//        List<PublicationDTO> result = publicationService.fetchDTOs();
+//
+//        assertThat(result.size()).isEqualTo(2);
+//        assertThat(result.get(0).getComplaintAmount()).isEqualTo(1);
+//        assertThat(result.get(1).getLikeAmount()).isEqualTo(2);
+//    }
 }

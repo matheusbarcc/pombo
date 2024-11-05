@@ -34,11 +34,11 @@ public class Publication {
     private List<User> likes;
 
     @OneToMany(mappedBy = "publication")
-    @JsonBackReference
+    @JsonBackReference(value = "publication-complaints")
     private List<Complaint> complaints;
 
     @OneToOne(mappedBy = "publication")
-    @JsonBackReference
+    @JsonBackReference(value = "publication-attachment")
     private Attachment attachment;
 
     private boolean blocked = false;
@@ -46,7 +46,8 @@ public class Publication {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public static PublicationDTO toDTO(Publication p, Integer likeAmount, Integer complaintAmount) {
+    public static PublicationDTO toDTO(Publication p, String publicationAttachmentUrl, String profilePictureUrl,
+                                       Integer likeAmount, Integer complaintAmount) {
         if(p.isBlocked()) {
             p.setContent("Bloqueado pelo administrador");
         }
@@ -54,10 +55,14 @@ public class Publication {
         return new PublicationDTO(
                 p.getId(),
                 p.getContent(),
+                publicationAttachmentUrl,
                 p.getUser().getId(),
                 p.getUser().getName(),
+                p.getUser().getEmail(),
+                profilePictureUrl,
                 likeAmount,
-                complaintAmount
+                complaintAmount,
+                p.getCreatedAt()
         );
     }
 }

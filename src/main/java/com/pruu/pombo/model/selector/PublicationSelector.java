@@ -1,5 +1,6 @@
 package com.pruu.pombo.model.selector;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pruu.pombo.model.entity.Publication;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -20,6 +21,9 @@ public class PublicationSelector extends BaseSelector implements Specification<P
     private String content;
     private LocalDateTime createdAtStart;
     private LocalDateTime createdAtEnd;
+
+    @JsonProperty("isLiked")
+    private boolean isLiked;
 
     @Override
     public Predicate toPredicate(Root<Publication> root, CriteriaQuery<?> query, CriteriaBuilder cb) {

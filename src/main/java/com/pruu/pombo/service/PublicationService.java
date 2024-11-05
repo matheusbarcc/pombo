@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PublicationService {
@@ -31,6 +32,9 @@ public class PublicationService {
 
     @Autowired
     private AttachmentRepository attachmentRepository;
+
+    @Autowired
+    private AttachmentService attachmentService;
 
     @Autowired
     private RSAEncoder rsaEncoder;
@@ -59,17 +63,6 @@ public class PublicationService {
         return result;
     }
 
-    public List<Publication> findAll() {
-        return publicationRepository.findAll(Sort.by(Sort.Direction.DESC, "createdAt"));
-    }
-
-    public Publication findById(String id) throws PomboException {
-        Publication publication = publicationRepository.findById(id).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
-        publication.setContent(rsaEncoder.decode(publication.getContent()));
-
-        return publication;
-    }
-
     // if the publication is already liked, the method will unlike it
     public void like(String userId, String publicationId) throws PomboException {
         Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
@@ -87,7 +80,28 @@ public class PublicationService {
         publicationRepository.save(publication);
     }
 
-    public List<Publication> fetchWithFilter(PublicationSelector selector) {
+    public PublicationDTO findById(String id) throws PomboException {
+        Publication publication = publicationRepository.findById(id).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
+        publication.setContent(rsaEncoder.decode(publication.getContent()));
+
+        Integer likeAmount = this.fetchPublicationLikes(publication.getId()).size();
+        Integer complaintAmount = this.fetchPublicationComplaints(publication.getId()).size();
+
+        String attachmentUrl = null;
+        String profilePictureUrl = null;
+
+        if (publication.getAttachment() != null) {
+            attachmentUrl = attachmentService.getAttachmentUrl(publication.getAttachment().getId());
+        }
+
+        if (publication.getUser().getProfilePicture() != null) {
+            profilePictureUrl = attachmentService.getAttachmentUrl(publication.getUser().getProfilePicture().getId());
+        }
+
+        return Publication.toDTO(publication, attachmentUrl, profilePictureUrl, likeAmount, complaintAmount);
+    }
+
+    public List<PublicationDTO> fetchWithFilter(PublicationSelector selector, String subjectId) throws PomboException {
         List<Publication> publications;
 
         if(selector.hasPagination()) {
@@ -101,11 +115,14 @@ public class PublicationService {
             publications = new ArrayList<>(publicationRepository.findAll(selector, Sort.by(Sort.Direction.DESC, "createdAt")));
         }
 
-        for(Publication p : publications) {
-            p.setContent(rsaEncoder.decode(p.getContent()));
+        if (selector.isLiked()) {
+            publications = publications.stream()
+                    .filter(pub -> pub.getLikes().stream()
+                            .anyMatch(user -> user.getId().equals(subjectId)))
+                    .collect(Collectors.toList());
         }
 
-        return publications;
+        return this.convertToDTO(publications);
     }
 
     public List<User> fetchPublicationLikes(String publicationId) throws PomboException {
@@ -120,15 +137,27 @@ public class PublicationService {
         return publication.getComplaints();
     }
 
-    public List<PublicationDTO> fetchDTOs() throws PomboException {
-        List<Publication> publications = this.findAll();
+    public List<PublicationDTO> convertToDTO(List<Publication> publications) throws PomboException {
         List<PublicationDTO> dtos = new ArrayList<>();
 
         for(Publication p : publications) {
+            String attachmentUrl = null;
+            String profilePictureUrl = null;
+
             p.setContent(rsaEncoder.decode(p.getContent()));
+
             Integer likeAmount = this.fetchPublicationLikes(p.getId()).size();
             Integer complaintAmount = this.fetchPublicationComplaints(p.getId()).size();
-            PublicationDTO dto = Publication.toDTO(p, likeAmount, complaintAmount);
+
+            if (p.getAttachment() != null) {
+                attachmentUrl = attachmentService.getAttachmentUrl(p.getAttachment().getId());
+            }
+
+            if (p.getUser().getProfilePicture() != null) {
+                profilePictureUrl = attachmentService.getAttachmentUrl(p.getUser().getProfilePicture().getId());
+            }
+
+            PublicationDTO dto = Publication.toDTO(p, attachmentUrl, profilePictureUrl, likeAmount, complaintAmount);
             dtos.add(dto);
         }
 
