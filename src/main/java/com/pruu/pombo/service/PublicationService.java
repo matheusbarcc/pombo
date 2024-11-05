@@ -85,7 +85,7 @@ public class PublicationService {
         publication.setContent(rsaEncoder.decode(publication.getContent()));
 
         Integer likeAmount = this.fetchPublicationLikes(publication.getId()).size();
-        Integer complaintAmount = this.fetchPublicationComplaints(publication.getId()).size();
+        Integer complaintAmount = publication.getComplaints().size();
 
         String attachmentUrl = null;
         String profilePictureUrl = null;
@@ -96,6 +96,14 @@ public class PublicationService {
 
         if (publication.getUser().getProfilePicture() != null) {
             profilePictureUrl = attachmentService.getAttachmentUrl(publication.getUser().getProfilePicture().getId());
+        }
+
+        if(publication.isBlocked()) {
+            throw new PomboException("Essa publicação foi bloqueada por um administrador.", HttpStatus.BAD_REQUEST);
+        }
+
+        if(publication.isDeleted()) {
+            throw new PomboException("Essa publicação foi deletada.", HttpStatus.BAD_REQUEST);
         }
 
         return Publication.toDTO(publication, attachmentUrl, profilePictureUrl, likeAmount, complaintAmount);
@@ -115,6 +123,8 @@ public class PublicationService {
             publications = new ArrayList<>(publicationRepository.findAll(selector, Sort.by(Sort.Direction.DESC, "createdAt")));
         }
 
+        publications = removeBlockedAndDeletedPublications(publications);
+
         if (selector.isLiked()) {
             publications = publications.stream()
                     .filter(pub -> pub.getLikes().stream()
@@ -131,10 +141,15 @@ public class PublicationService {
         return publication.getLikes();
     }
 
-    public List<Complaint> fetchPublicationComplaints(String publicationId) throws PomboException {
+    public void delete(String publicationId, String userId) throws PomboException {
         Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
 
-        return publication.getComplaints();
+        if(!publication.getUser().getId().equals(userId)) {
+            throw new PomboException("Você não pode excluir publicações de outros usuários.", HttpStatus.BAD_REQUEST);
+        }
+
+        publication.setDeleted(true);
+        publicationRepository.save(publication);
     }
 
     public List<PublicationDTO> convertToDTO(List<Publication> publications) throws PomboException {
@@ -147,7 +162,7 @@ public class PublicationService {
             p.setContent(rsaEncoder.decode(p.getContent()));
 
             Integer likeAmount = this.fetchPublicationLikes(p.getId()).size();
-            Integer complaintAmount = this.fetchPublicationComplaints(p.getId()).size();
+            Integer complaintAmount = p.getComplaints().size();
 
             if (p.getAttachment() != null) {
                 attachmentUrl = attachmentService.getAttachmentUrl(p.getAttachment().getId());
@@ -162,5 +177,11 @@ public class PublicationService {
         }
 
         return dtos;
+    }
+
+    public List<Publication> removeBlockedAndDeletedPublications(List<Publication> publications) throws PomboException {
+        return publications.stream()
+                .filter(pub -> !pub.isBlocked() && !pub.isDeleted())
+                .collect(Collectors.toList());
     }
 }

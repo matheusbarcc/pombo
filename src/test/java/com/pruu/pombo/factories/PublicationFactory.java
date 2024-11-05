@@ -12,7 +12,7 @@ public class PublicationFactory {
     public static Publication createPublication(User user) {
         Publication p = new Publication();
         p.setUser(user);
-        p.setContent(UUID.randomUUID().toString());
+        p.setContent("Lorem ipsum dolor sit amet");
         p.setLikes(new ArrayList<>());
         p.setComplaints(new ArrayList<>());
         p.setAttachment(null);

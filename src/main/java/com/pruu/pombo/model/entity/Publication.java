@@ -42,15 +42,13 @@ public class Publication {
     private Attachment attachment;
 
     private boolean blocked = false;
+    private boolean deleted = false;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     public static PublicationDTO toDTO(Publication p, String publicationAttachmentUrl, String profilePictureUrl,
                                        Integer likeAmount, Integer complaintAmount) {
-        if(p.isBlocked()) {
-            p.setContent("Bloqueado pelo administrador");
-        }
 
         return new PublicationDTO(
                 p.getId(),

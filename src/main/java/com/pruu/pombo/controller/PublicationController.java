@@ -96,4 +96,13 @@ public class PublicationController {
     public List<User> fetchPublicationLikes(@PathVariable String publicationId) throws PomboException {
         return publicationService.fetchPublicationLikes(publicationId);
     }
+
+    @DeleteMapping("/{publicationId}")
+    public ResponseEntity<Void> delete(@PathVariable String publicationId) throws PomboException {
+        User subject = authService.getAuthenticatedUser();
+
+        publicationService.delete(publicationId, subject.getId());
+
+        return ResponseEntity.ok().build();
+    }
 }
