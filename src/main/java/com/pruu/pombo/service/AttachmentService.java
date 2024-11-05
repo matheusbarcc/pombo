@@ -1,13 +1,13 @@
 package com.pruu.pombo.service;
 
 import com.amazonaws.AmazonClientException;
-import com.amazonaws.SdkClientException;
+import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
-import com.amazonaws.services.s3.model.S3Object;
-import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.entity.Attachment;
+import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.AttachmentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URL;
+import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -48,5 +50,33 @@ public class AttachmentService {
         attachmentRepository.save(attachment);
 
         return uniqueFileName;
+    }
+
+    public String getAttachmentUrl(String attachmentId) throws PomboException {
+        Attachment attachment = attachmentRepository.findById(attachmentId)
+                .orElseThrow(() -> new PomboException("Attachment not found", HttpStatus.NOT_FOUND));
+
+        Date expiration = new Date(System.currentTimeMillis() + 3600 * 1000); // 1 hour
+
+        GeneratePresignedUrlRequest generatePresignedUrlRequest =
+                new GeneratePresignedUrlRequest(bucketName, attachment.getUrl())
+                        .withMethod(HttpMethod.GET)
+                        .withExpiration(expiration);
+
+        URL url = s3.generatePresignedUrl(generatePresignedUrlRequest);
+
+        return url.toString();
+    }
+
+    public Attachment updateUserProfilePicture(User user) throws PomboException {
+        Attachment attachment = attachmentRepository.findById(user.getProfilePicture().getId()).orElseThrow(() -> new PomboException("Anexo não encontrado.", HttpStatus.BAD_REQUEST));
+
+        if(attachment.getUser() != null || attachment.getPublication() != null) {
+            throw new PomboException("O anexo já está atribuído à uma publicação ou usuário.", HttpStatus.BAD_REQUEST);
+        }
+
+        attachment.setUser(user);
+
+        return attachmentRepository.save(attachment);
     }
 }

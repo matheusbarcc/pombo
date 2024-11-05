@@ -1,6 +1,5 @@
 package com.pruu.pombo.model.repository;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.pruu.pombo.factories.UserFactory;

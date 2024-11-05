@@ -58,7 +58,8 @@ public class User implements UserDetails {
     private List<Complaint> complaints;
 
     @OneToOne(mappedBy = "user")
-    private Attachment attachment;
+    @JsonBackReference
+    private Attachment profilePicture;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

@@ -15,6 +15,7 @@ public class PublicationFactory {
         p.setContent(UUID.randomUUID().toString());
         p.setLikes(new ArrayList<>());
         p.setComplaints(new ArrayList<>());
+        p.setAttachment(null);
 
         return p;
     }

@@ -69,6 +69,8 @@ public class PublicationServiceTest {
         when(publicationRepository.save(publication)).thenReturn(publication);
         Publication result = publicationService.create(publication);
 
+        System.out.println(result);
+
         assertThat(result).isNotNull();
         assertThat(result.getUser()).isEqualTo(user);
     }

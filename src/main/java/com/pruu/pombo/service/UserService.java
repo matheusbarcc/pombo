@@ -33,10 +33,6 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    public User findById(String id) {
-        return userRepository.findById(id).orElse(null);
-    }
-
     public User update(User user) throws PomboException {
         this.standardizeCpf(user);
         this.verifyIfUserExists(user);
@@ -47,6 +43,10 @@ public class UserService implements UserDetailsService {
         user.setRole(userOnDatabase.getRole());
 
         return userRepository.save(user);
+    }
+
+    public User findById(String id) {
+        return userRepository.findById(id).orElse(null);
     }
 
     public List<User> fetchWithFilter(UserSelector selector) {

@@ -38,6 +38,7 @@ public class Publication {
     private List<Complaint> complaints;
 
     @OneToOne(mappedBy = "publication")
+    @JsonBackReference
     private Attachment attachment;
 
     private boolean blocked = false;

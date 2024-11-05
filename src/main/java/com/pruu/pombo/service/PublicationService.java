@@ -30,7 +30,7 @@ public class PublicationService {
     private UserRepository userRepository;
 
     @Autowired
-    private AttachmentRepository attachmentRepositoy;
+    private AttachmentRepository attachmentRepository;
 
     @Autowired
     private RSAEncoder rsaEncoder;
@@ -45,10 +45,15 @@ public class PublicationService {
         Publication result = publicationRepository.saveAndFlush(publication);
 
         if(publication.getAttachment() != null) {
-            Attachment attachment = attachmentRepositoy.findById(publication.getAttachment().getId()).orElseThrow(() -> new PomboException("Anexo não encontrado.", HttpStatus.BAD_REQUEST));
+            Attachment attachment = attachmentRepository.findById(publication.getAttachment().getId()).orElseThrow(() -> new PomboException("Anexo não encontrado.", HttpStatus.BAD_REQUEST));
+
+            if(attachment.getUser() != null || attachment.getPublication() != null) {
+                throw new PomboException("O anexo já está atribuído à uma publicação ou usuário.", HttpStatus.BAD_REQUEST);
+            }
+
             attachment.setPublication(publication);
 
-            attachmentRepositoy.save(attachment);
+            attachmentRepository.save(attachment);
         }
 
         return result;
