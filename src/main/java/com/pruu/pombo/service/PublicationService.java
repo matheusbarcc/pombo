@@ -5,7 +5,6 @@ import com.pruu.pombo.model.repository.AttachmentRepository;
 import com.pruu.pombo.utils.RSAEncoder;
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.dto.PublicationDTO;
-import com.pruu.pombo.model.entity.Complaint;
 import com.pruu.pombo.model.entity.Publication;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.PublicationRepository;
@@ -179,7 +178,7 @@ public class PublicationService {
         return dtos;
     }
 
-    public List<Publication> removeBlockedAndDeletedPublications(List<Publication> publications) throws PomboException {
+    public List<Publication> removeBlockedAndDeletedPublications(List<Publication> publications) {
         return publications.stream()
                 .filter(pub -> !pub.isBlocked() && !pub.isDeleted())
                 .collect(Collectors.toList());

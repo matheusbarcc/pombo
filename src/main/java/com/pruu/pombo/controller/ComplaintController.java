@@ -2,7 +2,7 @@ package com.pruu.pombo.controller;
 
 import com.pruu.pombo.auth.AuthService;
 import com.pruu.pombo.exception.PomboException;
-import com.pruu.pombo.model.dto.ComplaintDTO;
+import com.pruu.pombo.model.dto.ReportedPublicationDTO;
 import com.pruu.pombo.model.entity.Complaint;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.enums.ComplaintStatus;
@@ -51,6 +51,24 @@ public class ComplaintController {
         }
     }
 
+    @Operation(summary = "Finds a specific complaint (ADMIN ONLY)",
+            description = "Finds a specific complaint, the complaint id and the admin id must be informed in the request path",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "The complaint information is returned"),
+                    @ApiResponse(responseCode = "400", description = "Complaint not found"),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized user")
+            })
+    @GetMapping("/admin/{id}")
+    public Complaint findById(@PathVariable String id) throws PomboException {
+        User subject = authService.getAuthenticatedUser();
+
+        if (subject.getRole() == Role.ADMIN) {
+            return complaintService.findById(id);
+        } else {
+            throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
     @Operation(summary = "Fetches complaints with filters (ADMIN ONLY)",
             description = "Fetches a group of complaints based on a filter passed through the body, pagination also included." +
                     " The admin id must be informed in the request params.",
@@ -70,55 +88,12 @@ public class ComplaintController {
         }
     }
 
-    @Operation(summary = "Fetches all complaints (ADMIN ONLY)",
-            description = "Fetches all complaints, pagination also included. The admin id must be informed in the request params.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "A list of all complaints is returned."),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized user")
-            })
-    @GetMapping("/admin/all")
-    public List<Complaint> fetchAll() throws PomboException {
+    @PostMapping("/admin/fetch-reported-publications")
+    public List<ReportedPublicationDTO> fetchReportedPublications(@RequestBody ComplaintSelector selector) throws PomboException {
         User subject = authService.getAuthenticatedUser();
 
         if (subject.getRole() == Role.ADMIN) {
-            return complaintService.fetchAll();
-        } else {
-            throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    @Operation(summary = "Finds a specific complaint (ADMIN ONLY)",
-            description = "Finds a specific complaint, the complaint id and the admin id must be informed in the request path",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "The complaint information is returned"),
-                    @ApiResponse(responseCode = "400", description = "Complaint not found"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized user")
-            })
-    @GetMapping("/admin/{id}")
-    public Complaint findById(@PathVariable String id) throws PomboException {
-        User subject = authService.getAuthenticatedUser();
-
-        if (subject.getRole() == Role.ADMIN) {
-            return complaintService.findById(id);
-        } else {
-            throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    @Operation(summary = "Fetches a report from a specific complaint through a DTO (ADMIN ONLY)",
-            description = "Fetches a report from a specific complaint, each report contains: publication id, complaint amount," +
-                    " pending complaint amount and analysed complaint amount",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "The complaint information is returned"),
-                    @ApiResponse(responseCode = "400", description = "Complaint not found"),
-                    @ApiResponse(responseCode = "401", description = "Unauthorized user")
-            })
-    @GetMapping("/admin/dto/{id}")
-    public ComplaintDTO findDTOByPublicationId(@PathVariable String id) throws PomboException {
-        User subject = authService.getAuthenticatedUser();
-
-        if (subject.getRole() == Role.ADMIN) {
-            return complaintService.findDTOByPublicationId(id);
+            return complaintService.fetchReportedPublications(selector);
         } else {
             throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
         }

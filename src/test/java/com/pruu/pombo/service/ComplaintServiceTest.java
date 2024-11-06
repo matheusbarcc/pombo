@@ -8,7 +8,6 @@ import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.factories.ComplaintFactory;
 import com.pruu.pombo.factories.PublicationFactory;
 import com.pruu.pombo.factories.UserFactory;
-import com.pruu.pombo.model.dto.ComplaintDTO;
 import com.pruu.pombo.model.entity.Complaint;
 import com.pruu.pombo.model.entity.Publication;
 import com.pruu.pombo.model.entity.User;
@@ -129,27 +128,27 @@ class ComplaintServiceTest {
 
     // DTO TESTS
 
-    @Test
-    @DisplayName("Should be able to find DTO by publication id")
-    public void testFindDTO$success() {
-        Complaint complaint1 = ComplaintFactory.createComplaint(user, publication);
-        complaint1.setId("complaint-01");
-        complaint1.setStatus(ComplaintStatus.REJECTED);
-        Complaint complaint2 = ComplaintFactory.createComplaint(user, publication);
-        complaint2.setId("complaint-02");
-
-        List<Complaint> complaints = new ArrayList<>();
-        complaints.add(complaint1);
-        complaints.add(complaint2);
-
-        when(complaintRepository.findByPublicationId("publication-01")).thenReturn(complaints);
-        ComplaintDTO result = complaintService.findDTOByPublicationId("publication-01");
-
-        assertThat(result).isNotNull();
-        assertThat(result.getComplaintAmount()).isEqualTo(2);
-        assertThat(result.getPendingComplaintAmount()).isEqualTo(1);
-        assertThat(result.getAcceptedComplaintAmount()).isEqualTo(0);
-        assertThat(result.getRejectedComplaintAmount()).isEqualTo(1);
-    }
+//    @Test
+//    @DisplayName("Should be able to find DTO by publication id")
+//    public void testFindDTO$success() {
+//        Complaint complaint1 = ComplaintFactory.createComplaint(user, publication);
+//        complaint1.setId("complaint-01");
+//        complaint1.setStatus(ComplaintStatus.REJECTED);
+//        Complaint complaint2 = ComplaintFactory.createComplaint(user, publication);
+//        complaint2.setId("complaint-02");
+//
+//        List<Complaint> complaints = new ArrayList<>();
+//        complaints.add(complaint1);
+//        complaints.add(complaint2);
+//
+//        when(complaintRepository.findByPublicationId("publication-01")).thenReturn(complaints);
+//        ComplaintDTO result = complaintService.findDTOByPublicationId("publication-01");
+//
+//        assertThat(result).isNotNull();
+//        assertThat(result.getComplaintAmount()).isEqualTo(2);
+//        assertThat(result.getPendingComplaintAmount()).isEqualTo(1);
+//        assertThat(result.getAcceptedComplaintAmount()).isEqualTo(0);
+//        assertThat(result.getRejectedComplaintAmount()).isEqualTo(1);
+//    }
 
 }
