@@ -61,6 +61,16 @@ public class UserService implements UserDetailsService {
         return userRepository.findAll(selector);
     }
 
+//    public void delete(String id) throws PomboException {
+//        User userOnDatabase = this.userRepository.findById(id).orElseThrow(() -> new PomboException("Usuário não encontrado.", HttpStatus.BAD_REQUEST));
+//
+//        if(userOnDatabase.getPublications().isEmpty() || userOnDatabase.getComplaints().isEmpty()){
+//            userRepository.deleteById(id);
+//        } else {
+//            throw new PomboException("Usuário não pode ser excluído pois possui publicações ou denuncias criadas.", HttpStatus.BAD_REQUEST);
+//        }
+//    }
+
     public void standardizeCpf(User user) {
         user.setCpf(user.getCpf().replaceAll("[.]", ""));
         user.setCpf(user.getCpf().replaceAll("-", ""));

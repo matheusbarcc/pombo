@@ -128,4 +128,13 @@ public class ComplaintController {
             throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);
         }
     }
+
+    @DeleteMapping("/{complaintId}")
+    public ResponseEntity<Void> delete(@PathVariable String complaintId) throws PomboException {
+        User subject = authService.getAuthenticatedUser();
+
+        complaintService.delete(complaintId, subject.getId());
+
+        return ResponseEntity.ok().build();
+    }
 }

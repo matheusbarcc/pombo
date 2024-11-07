@@ -38,13 +38,6 @@ public class ComplaintService {
     private RSAEncoder rsaEncoder;
 
     public Complaint create(Complaint complaint) throws PomboException {
-        Publication reportedPublication = publicationRepository.findById(complaint.getPublication().getId()).orElseThrow(() -> new PomboException(
-                "Publicação não encontrada.", HttpStatus.BAD_REQUEST));
-
-        if(complaint.getUser().getId().equals(reportedPublication.getUser().getId())) {
-            throw new PomboException("Você não pode denunciar suas próprias publicações", HttpStatus.BAD_REQUEST);
-        }
-
         if(complaint.getReason() == null || !EnumSet.allOf(Reason.class).contains(complaint.getReason())) {
             throw new PomboException("Motivo inválido", HttpStatus.BAD_REQUEST);
         }
@@ -107,6 +100,16 @@ public class ComplaintService {
 
         complaint.setStatus(newStatus);
         complaintRepository.save(complaint);
+    }
+
+    public void delete(String complaintId, String userId) throws PomboException {
+        Complaint complaintOnDatabase = this.complaintRepository.findById(complaintId).orElseThrow(() -> new PomboException("Denúncia não encontrada.", HttpStatus.BAD_REQUEST));
+
+        if(complaintOnDatabase.getUser().getId().equals(userId)) {
+            this.complaintRepository.deleteById(complaintId);
+        } else {
+            throw new PomboException("Você não pode excluir denuncias de outros usuários.", HttpStatus.BAD_REQUEST);
+        }
     }
 
     public List<ReportedPublicationDTO> convertToReportedPublicationDTO(List<Publication> publications) throws PomboException {
