@@ -2,6 +2,7 @@ package com.pruu.pombo.controller;
 
 import com.pruu.pombo.auth.AuthService;
 import com.pruu.pombo.exception.PomboException;
+import com.pruu.pombo.model.dto.ComplaintDTO;
 import com.pruu.pombo.model.dto.ReportedPublicationDTO;
 import com.pruu.pombo.model.entity.Complaint;
 import com.pruu.pombo.model.entity.User;
@@ -78,7 +79,7 @@ public class ComplaintController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized user")
             })
     @PostMapping("/admin/filter")
-    public List<Complaint> fetchWithFilter(@RequestBody ComplaintSelector selector) throws PomboException {
+    public List<ComplaintDTO> fetchWithFilter(@RequestBody ComplaintSelector selector) throws PomboException {
         User subject = authService.getAuthenticatedUser();
 
         if (subject.getRole() == Role.ADMIN) {

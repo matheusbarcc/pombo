@@ -1,6 +1,7 @@
 package com.pruu.pombo.service;
 
 import com.pruu.pombo.exception.PomboException;
+import com.pruu.pombo.model.dto.ComplaintDTO;
 import com.pruu.pombo.model.dto.ReportedPublicationDTO;
 import com.pruu.pombo.model.entity.Complaint;
 import com.pruu.pombo.model.entity.Publication;
@@ -37,8 +38,12 @@ public class ComplaintService {
     private RSAEncoder rsaEncoder;
 
     public Complaint create(Complaint complaint) throws PomboException {
-        publicationRepository.findById(complaint.getPublication().getId()).orElseThrow(() -> new PomboException(
+        Publication reportedPublication = publicationRepository.findById(complaint.getPublication().getId()).orElseThrow(() -> new PomboException(
                 "Publicação não encontrada.", HttpStatus.BAD_REQUEST));
+
+        if(complaint.getUser().getId().equals(reportedPublication.getUser().getId())) {
+            throw new PomboException("Você não pode denunciar suas próprias publicações", HttpStatus.BAD_REQUEST);
+        }
 
         if(complaint.getReason() == null || !EnumSet.allOf(Reason.class).contains(complaint.getReason())) {
             throw new PomboException("Motivo inválido", HttpStatus.BAD_REQUEST);
@@ -51,7 +56,7 @@ public class ComplaintService {
         return complaintRepository.findById(complaintId).orElseThrow(() -> new PomboException("Denúncia não encontrada.", HttpStatus.BAD_REQUEST));
     }
 
-    public List<Complaint> fetchWithFilter(ComplaintSelector selector) {
+    public List<ComplaintDTO> fetchWithFilter(ComplaintSelector selector) throws PomboException {
         List<Complaint> complaints = new ArrayList<>();
 
         if(selector.hasPagination()) {
@@ -62,9 +67,7 @@ public class ComplaintService {
             complaints = complaintRepository.findAll(selector, page).toList();
         }
 
-        complaints = removeBlockedAndDeletedPublicationsComplaints(complaints);
-
-        return complaints;
+        return convertToComplaintDTO(complaints);
     }
 
     public List<ReportedPublicationDTO> fetchReportedPublications(ComplaintSelector selector) throws PomboException {
@@ -77,6 +80,8 @@ public class ComplaintService {
             PageRequest page = PageRequest.of(pageNumber - 1, pageSize, Sort.by(Sort.Direction.ASC, "createdAt"));
             publications = publicationRepository.findAll(page).toList();
         }
+
+        publications = removeBlockedAndDeletedPublications(publications);
 
         return convertToReportedPublicationDTO(publications);
     }
@@ -141,9 +146,26 @@ public class ComplaintService {
         return dtos;
     }
 
-    public List<Complaint> removeBlockedAndDeletedPublicationsComplaints(List<Complaint> complaints) {
-        return complaints.stream()
-                .filter(comp -> !comp.getPublication().isBlocked() && !comp.getPublication().isDeleted())
+    public List<ComplaintDTO> convertToComplaintDTO(List<Complaint> complaints) throws PomboException {
+        List<ComplaintDTO> dtos = new ArrayList<>();
+
+        for(Complaint c : complaints) {
+            String profilePictureUrl = null;
+
+            if (c.getUser().getProfilePicture() != null) {
+                profilePictureUrl = attachmentService.getAttachmentUrl(c.getUser().getProfilePicture().getId());
+            }
+
+            ComplaintDTO dto = Complaint.toComplaintDTO(c, profilePictureUrl);
+            dtos.add(dto);
+        }
+
+        return dtos;
+    }
+
+    public List<Publication> removeBlockedAndDeletedPublications(List<Publication> publications) {
+        return publications.stream()
+                .filter(pub -> !pub.isBlocked() && !pub.isDeleted())
                 .collect(Collectors.toList());
     }
 }

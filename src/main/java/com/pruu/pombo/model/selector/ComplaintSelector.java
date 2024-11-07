@@ -1,6 +1,7 @@
 package com.pruu.pombo.model.selector;
 
 import com.pruu.pombo.model.entity.Complaint;
+import com.pruu.pombo.model.enums.ComplaintStatus;
 import com.pruu.pombo.model.enums.Reason;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
@@ -19,6 +20,7 @@ public class ComplaintSelector extends BaseSelector implements Specification<Com
     private String userId;
     private String publicationId;
     private Reason reason;
+    private ComplaintStatus status;
     private LocalDateTime createdAtStart;
     private LocalDateTime createdAtEnd;
 
@@ -36,6 +38,10 @@ public class ComplaintSelector extends BaseSelector implements Specification<Com
 
         if(this.getReason() != null) {
             predicates.add(cb.equal(root.get("reason"), this.getReason()));
+        }
+
+        if(this.getStatus() != null) {
+            predicates.add(cb.equal(root.get("status"), this.getStatus()));
         }
 
         applyDateRangeFilter(root, cb, predicates, this.getCreatedAtStart(), this.getCreatedAtEnd(), "createdAt");

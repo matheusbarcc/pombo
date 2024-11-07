@@ -1,5 +1,6 @@
 package com.pruu.pombo.model.entity;
 
+import com.pruu.pombo.model.dto.ComplaintDTO;
 import com.pruu.pombo.model.dto.ReportedPublicationDTO;
 import com.pruu.pombo.model.enums.ComplaintStatus;
 import com.pruu.pombo.model.enums.Reason;
@@ -55,7 +56,21 @@ public class Complaint {
                 complaintAmount,
                 pendingComplaintAmount,
                 acceptedComplaintAmount,
-                rejectedComplaintAmount
+                rejectedComplaintAmount,
+                p.getCreatedAt()
+        );
+    }
+
+    public static ComplaintDTO toComplaintDTO(Complaint c, String userProfilePictureUrl) {
+        return new ComplaintDTO(
+                c.getId(),
+                c.getUser().getId(),
+                c.getUser().getName(),
+                c.getUser().getEmail(),
+                userProfilePictureUrl,
+                c.getReason(),
+                c.getStatus(),
+                c.getCreatedAt()
         );
     }
 }
