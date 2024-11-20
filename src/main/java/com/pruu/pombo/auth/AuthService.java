@@ -18,7 +18,7 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
 
-    public AuthService(JwtService jwtService, UserRepository userRepository) {
+    public AuthService(JwtService jwtService) {
         this.jwtService = jwtService;
     }
 

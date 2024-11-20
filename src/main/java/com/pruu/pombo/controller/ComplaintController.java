@@ -108,8 +108,8 @@ public class ComplaintController {
                     @ApiResponse(responseCode = "400", description = "Complaint not found"),
                     @ApiResponse(responseCode = "401", description = "Unauthorized user")
             })
-    @PatchMapping("/admin/update-status/{publicationId}/{newStatusString}")
-    public ResponseEntity<Void> updateStatus(@PathVariable String publicationId, @PathVariable String newStatusString) throws PomboException {
+    @PatchMapping("/admin/update-status/{complaintId}/{newStatusString}")
+    public ResponseEntity<Void> updateStatus(@PathVariable String complaintId, @PathVariable String newStatusString) throws PomboException {
         User subject = authService.getAuthenticatedUser();
         ComplaintStatus newStatus = null;
 
@@ -122,7 +122,7 @@ public class ComplaintController {
         }
 
         if (subject.getRole() == Role.ADMIN) {
-            complaintService.updateStatus(publicationId, newStatus);
+            complaintService.updateStatus(complaintId, newStatus);
             return ResponseEntity.ok().build();
         } else {
             throw new PomboException("Usuário não autorizado.", HttpStatus.UNAUTHORIZED);

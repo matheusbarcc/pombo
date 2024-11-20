@@ -98,6 +98,7 @@ public class ComplaintService {
             publicationRepository.save(publication);
         }
 
+
         complaint.setStatus(newStatus);
         complaintRepository.save(complaint);
     }
