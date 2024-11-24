@@ -2,9 +2,11 @@ package com.pruu.pombo.controller;
 
 import com.pruu.pombo.auth.AuthService;
 import com.pruu.pombo.exception.PomboException;
+import com.pruu.pombo.model.dto.UserDTO;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.enums.Role;
 import com.pruu.pombo.model.selector.UserSelector;
+import com.pruu.pombo.service.AttachmentService;
 import com.pruu.pombo.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,6 +26,9 @@ public class UserController {
     private UserService userService;
 
     @Autowired
+    private AttachmentService attachmentService;
+
+    @Autowired
     private AuthService authService;
 
     @Operation(summary = "Updates a user",
@@ -40,6 +45,19 @@ public class UserController {
         user.setId(subject.getId());
 
         return userService.update(user);
+    }
+
+    @GetMapping("/authenticated")
+    public UserDTO getAuthenticatedUser() throws PomboException {
+        User user = authService.getAuthenticatedUser();
+
+        String profilePictureUrl = null;
+
+        if (user.getProfilePicture() != null) {
+            profilePictureUrl = attachmentService.getAttachmentUrl(user.getProfilePicture().getId());
+        }
+
+        return User.toDTO(user, profilePictureUrl);
     }
 
     @Operation(summary = "Fetches users with filters",

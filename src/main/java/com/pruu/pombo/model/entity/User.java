@@ -1,6 +1,8 @@
 package com.pruu.pombo.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.pruu.pombo.model.dto.PublicationDTO;
+import com.pruu.pombo.model.dto.UserDTO;
 import com.pruu.pombo.model.enums.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -81,5 +83,14 @@ public class User implements UserDetails {
     @Override
     public String getUsername() {
         return this.email;
+    }
+
+    public static UserDTO toDTO(User u, String profilePictureUrl) {
+
+        return new UserDTO(
+                u.getName(),
+                u.getEmail(),
+                profilePictureUrl
+        );
     }
 }
