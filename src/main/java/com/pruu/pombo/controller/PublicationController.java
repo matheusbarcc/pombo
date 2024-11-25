@@ -3,6 +3,7 @@ package com.pruu.pombo.controller;
 import com.pruu.pombo.auth.AuthService;
 import com.pruu.pombo.exception.PomboException;
 import com.pruu.pombo.model.dto.PublicationDTO;
+import com.pruu.pombo.model.dto.UserDTO;
 import com.pruu.pombo.model.entity.Publication;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.enums.Role;
@@ -93,7 +94,7 @@ public class PublicationController {
                     @ApiResponse(responseCode = "400", description = "Publication not found"),
             })
     @GetMapping("/likes/{publicationId}")
-    public List<User> fetchPublicationLikes(@PathVariable String publicationId) throws PomboException {
+    public List<UserDTO> fetchPublicationLikes(@PathVariable String publicationId) throws PomboException {
         return publicationService.fetchPublicationLikes(publicationId);
     }
 

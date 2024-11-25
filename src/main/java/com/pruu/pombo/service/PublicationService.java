@@ -1,5 +1,6 @@
 package com.pruu.pombo.service;
 
+import com.pruu.pombo.model.dto.UserDTO;
 import com.pruu.pombo.model.entity.Attachment;
 import com.pruu.pombo.model.repository.AttachmentRepository;
 import com.pruu.pombo.utils.RSAEncoder;
@@ -134,10 +135,25 @@ public class PublicationService {
         return this.convertToDTO(publications);
     }
 
-    public List<User> fetchPublicationLikes(String publicationId) throws PomboException {
+    public List<UserDTO> fetchPublicationLikes(String publicationId) throws PomboException {
         Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
 
-        return publication.getLikes();
+        List<User> likes = publication.getLikes();
+        List<UserDTO> dtos = new ArrayList<>();
+
+        for(User user : likes) {
+            String profilePictureUrl = null;
+
+            if(user.getProfilePicture() != null) {
+                profilePictureUrl = attachmentService.getAttachmentUrl(user.getProfilePicture().getId());
+            }
+
+            UserDTO dto = User.toDTO(user, profilePictureUrl);
+
+            dtos.add(dto);
+        }
+
+        return dtos;
     }
 
     public void delete(String publicationId, String userId) throws PomboException {

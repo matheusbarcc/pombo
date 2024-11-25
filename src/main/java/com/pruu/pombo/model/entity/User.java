@@ -88,9 +88,11 @@ public class User implements UserDetails {
     public static UserDTO toDTO(User u, String profilePictureUrl) {
 
         return new UserDTO(
+                u.getId(),
                 u.getName(),
                 u.getEmail(),
-                profilePictureUrl
+                profilePictureUrl,
+                u.getCreatedAt()
         );
     }
 }

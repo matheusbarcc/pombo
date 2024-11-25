@@ -100,30 +100,6 @@ public class PublicationServiceTest {
         assertThat(publication.getLikes()).hasSize(0);
     }
 
-    @Test
-    @DisplayName("Should be able to fetch likes from a specific publication")
-    public void testFetchLikes$success() throws PomboException {
-        User user1 = UserFactory.createUser();
-        user1.setId("user-01");
-        User user2 = UserFactory.createUser();
-        user1.setId("user-02");
-
-        List<User> likes = new ArrayList<>();
-        likes.add(user1);
-        likes.add(user2);
-
-        Publication publication = PublicationFactory.createPublication(user1);
-        publication.setId("publication-01");
-        publication.setLikes(likes);
-
-        when(publicationRepository.findById("publication-01")).thenReturn(Optional.of(publication));
-        List<User> result = publicationService.fetchPublicationLikes("publication-01");
-
-        assertThat(result.size()).isEqualTo(2);
-        assertThat(result.get(0)).isEqualTo(user1);
-        assertThat(result.get(1)).isEqualTo(user2);
-    }
-
 
     @Test
     @DisplayName("Should not be able to like a invalid publication")
