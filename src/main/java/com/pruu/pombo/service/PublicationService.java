@@ -36,15 +36,10 @@ public class PublicationService {
     @Autowired
     private AttachmentService attachmentService;
 
-    @Autowired
-    private RSAEncoder rsaEncoder;
-
     public Publication create(Publication publication) throws PomboException {
         if(publication.getContent().length() > 300) {
             throw new PomboException("O conteúdo do Pruu deve conter no máximo 300 caracteres.", HttpStatus.BAD_REQUEST);
         }
-
-        publication.setContent(rsaEncoder.encode(publication.getContent()));
 
         Publication result = publicationRepository.saveAndFlush(publication);
 
@@ -64,25 +59,29 @@ public class PublicationService {
     }
 
     // if the publication is already liked, the method will unlike it
-    public void like(String userId, String publicationId) throws PomboException {
+    public boolean like(String userId, String publicationId) throws PomboException {
         Publication publication = publicationRepository.findById(publicationId).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
         User user = userRepository.findById(userId).orElseThrow(() -> new PomboException("Usuário não encontrado.", HttpStatus.BAD_REQUEST));
 
         List<User> likes = publication.getLikes();
 
+        boolean response;
+
         if(likes.contains(user)) {
             likes.remove(user);
+            response = false;
         } else {
             likes.add(user);
+            response = true;
         }
 
         publication.setLikes(likes);
         publicationRepository.save(publication);
+        return response;
     }
 
     public PublicationDTO findById(String id) throws PomboException {
         Publication publication = publicationRepository.findById(id).orElseThrow(() -> new PomboException("Publicação não encontrada.", HttpStatus.BAD_REQUEST));
-        publication.setContent(rsaEncoder.decode(publication.getContent()));
 
         Integer likeAmount = this.fetchPublicationLikes(publication.getId()).size();
         Integer complaintAmount = publication.getComplaints().size();
@@ -173,8 +172,6 @@ public class PublicationService {
         for(Publication p : publications) {
             String attachmentUrl = null;
             String profilePictureUrl = null;
-
-            p.setContent(rsaEncoder.decode(p.getContent()));
 
             Integer likeAmount = this.fetchPublicationLikes(p.getId()).size();
             Integer complaintAmount = p.getComplaints().size();

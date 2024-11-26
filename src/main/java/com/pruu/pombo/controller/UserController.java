@@ -77,7 +77,7 @@ public class UserController {
                     @ApiResponse(responseCode = "200", description = "The user information is returned"),
             })
     @GetMapping("/{id}")
-    public User findById(@PathVariable String id) {
+    public UserDTO findById(@PathVariable String id) throws PomboException {
         return userService.findById(id);
     }
 

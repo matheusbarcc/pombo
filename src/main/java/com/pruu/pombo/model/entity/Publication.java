@@ -10,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -50,6 +51,12 @@ public class Publication {
     public static PublicationDTO toDTO(Publication p, String publicationAttachmentUrl, String profilePictureUrl,
                                        Integer likeAmount, Integer complaintAmount) {
 
+        List<String> likesUserIds = new ArrayList<>();
+
+        for(User u : p.getLikes()) {
+            likesUserIds.add(u.getId());
+        }
+
         return new PublicationDTO(
                 p.getId(),
                 p.getContent(),
@@ -58,6 +65,7 @@ public class Publication {
                 p.getUser().getName(),
                 p.getUser().getEmail(),
                 profilePictureUrl,
+                likesUserIds,
                 likeAmount,
                 complaintAmount,
                 p.getCreatedAt()

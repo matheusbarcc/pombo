@@ -76,12 +76,11 @@ public class PublicationController {
                     @ApiResponse(responseCode = "400", description = "User or publication not found")
             })
     @PostMapping("/like/{publicationId}")
-    public ResponseEntity<Void> like(@PathVariable String publicationId) throws PomboException {
+    public boolean like(@PathVariable String publicationId) throws PomboException {
         User subject = authService.getAuthenticatedUser();
 
         if (subject.getRole() == Role.USER) {
-            publicationService.like(subject.getId(), publicationId);
-            return ResponseEntity.ok().build();
+            return publicationService.like(subject.getId(), publicationId);
         } else {
             throw new PomboException("Administradores não podem dar like.", HttpStatus.UNAUTHORIZED);
         }

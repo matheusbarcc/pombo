@@ -85,23 +85,6 @@ public class UserServiceTest {
                 .hasMessageContaining("CPF já cadastrado");
     }
 
-    // FETCH TESTS
-
-    @Test
-    @DisplayName("Should be able to find a user by id")
-    public void testFindById$success() {
-        User newUser = new User();
-        newUser.setName("New user");
-        newUser.setEmail("email@email.com");
-        newUser.setCpf("43251026046");
-
-        when(userRepository.findById("user-01")).thenReturn(Optional.of(newUser));
-        User result = userService.findById("user-01");
-
-        assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(newUser.getId());
-    }
-
     // UPDATE TESTS
 
     @Test

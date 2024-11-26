@@ -1,6 +1,7 @@
 package com.pruu.pombo.service;
 
 import com.pruu.pombo.exception.PomboException;
+import com.pruu.pombo.model.dto.UserDTO;
 import com.pruu.pombo.model.entity.User;
 import com.pruu.pombo.model.repository.UserRepository;
 import com.pruu.pombo.model.selector.UserSelector;
@@ -21,6 +22,9 @@ public class UserService implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private AttachmentService attachmentService;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByEmail(username).orElseThrow(() -> new UsernameNotFoundException("Usuário não encontrado " + username));
@@ -38,6 +42,7 @@ public class UserService implements UserDetailsService {
         this.verifyIfUserExists(user);
         User userOnDatabase = this.userRepository.findById(user.getId()).orElseThrow(() -> new PomboException("Usuário não encontrado.", HttpStatus.BAD_REQUEST));
 
+        user.setEmail(userOnDatabase.getEmail());
         user.setPassword(userOnDatabase.getPassword());
         user.setCreatedAt(userOnDatabase.getCreatedAt());
         user.setRole(userOnDatabase.getRole());
@@ -45,8 +50,16 @@ public class UserService implements UserDetailsService {
         return userRepository.save(user);
     }
 
-    public User findById(String id) {
-        return userRepository.findById(id).orElse(null);
+    public UserDTO findById(String id) throws PomboException {
+        User user = userRepository.findById(id).orElse(null);
+
+        String profilePictureUrl = null;
+
+        if(user.getProfilePicture() != null) {
+            profilePictureUrl = attachmentService.getAttachmentUrl(user.getProfilePicture().getId());
+        }
+
+        return User.toDTO(user, profilePictureUrl);
     }
 
     public List<User> fetchWithFilter(UserSelector selector) {
