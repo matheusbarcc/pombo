@@ -10,7 +10,6 @@ import com.pruu.pombo.model.enums.Reason;
 import com.pruu.pombo.model.repository.ComplaintRepository;
 import com.pruu.pombo.model.repository.PublicationRepository;
 import com.pruu.pombo.model.selector.ComplaintSelector;
-import com.pruu.pombo.utils.RSAEncoder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -33,9 +32,6 @@ public class ComplaintService {
 
     @Autowired
     private AttachmentService attachmentService;
-
-    @Autowired
-    private RSAEncoder rsaEncoder;
 
     public Complaint create(Complaint complaint) throws PomboException {
         if(complaint.getReason() == null || !EnumSet.allOf(Reason.class).contains(complaint.getReason())) {
@@ -117,7 +113,6 @@ public class ComplaintService {
         List<ReportedPublicationDTO> dtos = new ArrayList<>();
 
         for(Publication p : publications) {
-            p.setContent(rsaEncoder.decode(p.getContent()));
             String profilePictureUrl = null;
             List<Complaint> complaints = p.getComplaints();
 

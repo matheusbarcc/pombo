@@ -43,6 +43,7 @@ public class UserService implements UserDetailsService {
         User userOnDatabase = this.userRepository.findById(user.getId()).orElseThrow(() -> new PomboException("Usuário não encontrado.", HttpStatus.BAD_REQUEST));
 
         user.setEmail(userOnDatabase.getEmail());
+        user.setCpf(userOnDatabase.getCpf());
         user.setPassword(userOnDatabase.getPassword());
         user.setCreatedAt(userOnDatabase.getCreatedAt());
         user.setRole(userOnDatabase.getRole());
